@@ -10,6 +10,16 @@ async function totalPeriodo(db: ReturnType<typeof clienteTurso>, condicionFecha:
   return Number(r.rows[0]?.total ?? 0);
 }
 
+// Variación contra el período anterior equivalente — null cuando no hay
+// base de comparación (el período anterior dio 0), para no mostrar un
+// "+∞%" sin sentido.
+function variacion(actual: number, anterior: number): number | null {
+  if (anterior <= 0) return null;
+  return ((actual - anterior) / anterior) * 100;
+}
+
+type ProductoTop = { nombre: string; cantidad: number };
+
 export default async function PanelPage() {
   const sesion = obtenerSesion();
   if (!sesion) redirect("/login");
@@ -19,20 +29,55 @@ export default async function PanelPage() {
 
   const db = clienteTurso(negocio.turso_url, negocio.turso_token);
 
-  const [config, hoyBs, semanaBs, mesBs] = await Promise.all([
+  const [
+    config,
+    hoyBs,
+    ayerBs,
+    semanaBs,
+    semanaAnteriorBs,
+    mesBs,
+    mesAnteriorBs,
+    deuda,
+    productoTop
+  ] = await Promise.all([
     db.execute("SELECT tasa_cambio_dia, nombre_negocio FROM config WHERE id = 1"),
     totalPeriodo(db, "date(fecha_hora) = date('now')"),
+    totalPeriodo(db, "date(fecha_hora) = date('now', '-1 day')"),
     totalPeriodo(db, "date(fecha_hora) >= date('now', '-6 days')"),
-    totalPeriodo(db, "strftime('%Y-%m', fecha_hora) = strftime('%Y-%m', 'now')")
+    totalPeriodo(db, "date(fecha_hora) BETWEEN date('now', '-13 days') AND date('now', '-7 days')"),
+    totalPeriodo(db, "strftime('%Y-%m', fecha_hora) = strftime('%Y-%m', 'now')"),
+    totalPeriodo(db, "strftime('%Y-%m', fecha_hora) = strftime('%Y-%m', 'now', '-1 month')"),
+    // Mismo criterio que Cuentas.tsx del programa: monto_pendiente_usd ya
+    // está en dólares, no hace falta convertirlo.
+    db.execute("SELECT COALESCE(SUM(monto_pendiente_usd), 0) as total FROM ventas WHERE estado = 'CREDITO_PENDIENTE'"),
+    // Producto más vendido del mes — mismo criterio que Estadisticas.tsx:
+    // un producto por peso cuenta como 1 línea, no como los kilos que
+    // pesó esa venta (mezclar kilos con unidades no tiene sentido acá).
+    db.execute(
+      `SELECT p.nombre,
+              SUM(CASE WHEN p.por_peso = 1 THEN 1 ELSE vi.cantidad END) as cantidad
+       FROM venta_items vi
+       JOIN ventas v ON v.id = vi.venta_id
+       JOIN productos p ON p.id = vi.producto_id
+       WHERE strftime('%Y-%m', v.fecha_hora) = strftime('%Y-%m', 'now')
+       GROUP BY vi.producto_id
+       ORDER BY cantidad DESC
+       LIMIT 1`
+    )
   ]);
 
   const tasa = Number(config.rows[0]?.tasa_cambio_dia ?? 1) || 1;
   const nombreNegocio = (config.rows[0]?.nombre_negocio as string) ?? negocio.negocio;
+  const deudaUsd = Number(deuda.rows[0]?.total ?? 0);
+  const filaTop = productoTop.rows[0];
+  const top: ProductoTop | undefined = filaTop
+    ? { nombre: String(filaTop.nombre), cantidad: Number(filaTop.cantidad) }
+    : undefined;
 
   const tarjetas = [
-    { titulo: "Hoy", bs: hoyBs },
-    { titulo: "Últimos 7 días", bs: semanaBs },
-    { titulo: "Este mes", bs: mesBs }
+    { titulo: "Hoy", bs: hoyBs, variacion: variacion(hoyBs, ayerBs), comparacion: "vs. ayer" },
+    { titulo: "Últimos 7 días", bs: semanaBs, variacion: variacion(semanaBs, semanaAnteriorBs), comparacion: "vs. los 7 días previos" },
+    { titulo: "Este mes", bs: mesBs, variacion: variacion(mesBs, mesAnteriorBs), comparacion: "vs. el mes pasado" }
   ];
 
   return (
@@ -51,8 +96,30 @@ export default async function PanelPage() {
             <p className="text-sm text-gray-500">{t.titulo}</p>
             <p className="text-2xl font-semibold mt-1">Bs {t.bs.toFixed(2)}</p>
             <p className="text-sm text-kaxa-600 font-medium">USD {(t.bs / tasa).toFixed(2)}</p>
+            <p className={`text-xs mt-2 ${t.variacion === null ? "text-gray-400" : t.variacion >= 0 ? "text-green-600" : "text-red-500"}`}>
+              {t.variacion === null ? "Sin datos del período anterior" : `${t.variacion >= 0 ? "▲" : "▼"} ${Math.abs(t.variacion).toFixed(0)}% ${t.comparacion}`}
+            </p>
           </div>
         ))}
+
+        <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5">
+          <p className="text-sm text-gray-500">Cuentas por cobrar</p>
+          <p className="text-2xl font-semibold mt-1">USD {deudaUsd.toFixed(2)}</p>
+          <p className="text-sm text-kaxa-600 font-medium">Bs {(deudaUsd * tasa).toFixed(2)}</p>
+          <p className="text-xs text-gray-400 mt-2">Lo que te deben tus clientes a crédito, a hoy</p>
+        </div>
+
+        <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5">
+          <p className="text-sm text-gray-500">Producto más vendido este mes</p>
+          {top ? (
+            <>
+              <p className="text-2xl font-semibold mt-1">{top.nombre}</p>
+              <p className="text-sm text-kaxa-600 font-medium">{top.cantidad} vendidos</p>
+            </>
+          ) : (
+            <p className="text-sm text-gray-400 mt-1">Todavía no hay ventas este mes</p>
+          )}
+        </div>
       </div>
 
       <form action="/api/logout" method="post" className="mt-8">
