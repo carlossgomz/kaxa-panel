@@ -53,6 +53,9 @@ export default async function PanelPage() {
     // Producto más vendido del mes — mismo criterio que Estadisticas.tsx:
     // un producto por peso cuenta como 1 línea, no como los kilos que
     // pesó esa venta (mezclar kilos con unidades no tiene sentido acá).
+    // Se excluye el mismo producto "placeholder" del recargo de delivery
+    // (código de barra 1111111, legado de antes de la integración) que ya
+    // excluye Estadisticas.tsx — no es un producto real.
     db.execute(
       `SELECT p.nombre,
               SUM(CASE WHEN p.por_peso = 1 THEN 1 ELSE vi.cantidad END) as cantidad
@@ -60,6 +63,7 @@ export default async function PanelPage() {
        JOIN ventas v ON v.id = vi.venta_id
        JOIN productos p ON p.id = vi.producto_id
        WHERE strftime('%Y-%m', v.fecha_hora) = strftime('%Y-%m', 'now')
+         AND vi.producto_id != 'f195fbac-103d-48fa-a27a-28371fba7745'
        GROUP BY vi.producto_id
        ORDER BY cantidad DESC
        LIMIT 1`
