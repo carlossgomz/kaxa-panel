@@ -86,66 +86,68 @@ export default async function PanelPage() {
         🛒 Nueva venta
       </Link>
 
-      <div className="grid grid-cols-1 gap-3">
-        <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 gap-3 md:gap-4">
+        <div className="grid grid-cols-3 gap-2 md:gap-4">
           {tarjetas.map((t) => (
-            <div key={t.titulo} className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3">
-              <p className="text-[11px] text-gray-500 leading-tight">{t.titulo}</p>
-              <p className="text-base font-semibold mt-1 leading-tight">Bs {t.bs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</p>
-              <p className="text-[11px] text-kaxa-600 font-medium">${(t.bs / tasa).toFixed(0)}</p>
-              <p className={`text-[10px] mt-1 leading-tight ${t.variacion === null ? "text-gray-400" : t.variacion >= 0 ? "text-green-600" : "text-red-500"}`}>
+            <div key={t.titulo} className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3 md:p-4">
+              <p className="text-[11px] md:text-xs text-gray-500 leading-tight">{t.titulo}</p>
+              <p className="text-base md:text-xl font-semibold mt-1 leading-tight">Bs {t.bs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</p>
+              <p className="text-[11px] md:text-sm text-kaxa-600 font-medium">${(t.bs / tasa).toFixed(0)}</p>
+              <p className={`text-[10px] md:text-xs mt-1 leading-tight ${t.variacion === null ? "text-gray-400" : t.variacion >= 0 ? "text-green-600" : "text-red-500"}`}>
                 {t.variacion === null ? "—" : `${t.variacion >= 0 ? "▲" : "▼"} ${Math.abs(t.variacion).toFixed(0)}%`}
               </p>
             </div>
           ))}
         </div>
 
-        <Link
-          href="/panel/cobrar"
-          className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5 block transition-transform active:scale-[0.98]"
-        >
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-500">💵 Cuentas por cobrar</p>
-            <span className="text-kaxa-400 text-sm">→</span>
-          </div>
-          <p className="text-2xl font-semibold mt-1">USD {deudaUsd.toFixed(2)}</p>
-          <p className="text-sm text-kaxa-600 font-medium">Bs {(deudaUsd * tasa).toFixed(2)}</p>
-          <p className="text-xs text-gray-400 mt-2">Lo que te deben tus clientes a crédito, a hoy</p>
-        </Link>
+        <div className="md:grid md:grid-cols-2 md:gap-4 flex flex-col gap-3 md:gap-0">
+          <Link
+            href="/panel/cobrar"
+            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5 block transition-transform active:scale-[0.98] hover:border-kaxa-200"
+          >
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-gray-500">💵 Cuentas por cobrar</p>
+              <span className="text-kaxa-400 text-sm">→</span>
+            </div>
+            <p className="text-2xl font-semibold mt-1">USD {deudaUsd.toFixed(2)}</p>
+            <p className="text-sm text-kaxa-600 font-medium">Bs {(deudaUsd * tasa).toFixed(2)}</p>
+            <p className="text-xs text-gray-400 mt-2">Lo que te deben tus clientes a crédito, a hoy</p>
+          </Link>
 
-        <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5">
-          <p className="text-sm text-gray-500">🏆 Producto más vendido este mes</p>
-          {top ? (
-            <>
-              <p className="text-2xl font-semibold mt-1">{top.nombre}</p>
-              <p className="text-sm text-kaxa-600 font-medium">{top.cantidad} vendidos</p>
-            </>
-          ) : (
-            <p className="text-sm text-gray-400 mt-1">Todavía no hay ventas este mes</p>
-          )}
+          <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5">
+            <p className="text-sm text-gray-500">🏆 Producto más vendido este mes</p>
+            {top ? (
+              <>
+                <p className="text-2xl font-semibold mt-1">{top.nombre}</p>
+                <p className="text-sm text-kaxa-600 font-medium">{top.cantidad} vendidos</p>
+              </>
+            ) : (
+              <p className="text-sm text-gray-400 mt-1">Todavía no hay ventas este mes</p>
+            )}
+          </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-2 md:gap-4">
           <Link
             href="/panel/facturas"
-            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3 flex flex-col items-center gap-1 text-center transition-transform active:scale-[0.98]"
+            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3 md:p-5 flex flex-col items-center gap-1 text-center transition-transform active:scale-[0.98] hover:border-kaxa-200"
           >
             <span className="text-xl">🧾</span>
-            <span className="text-xs font-medium">Facturas</span>
+            <span className="text-xs md:text-sm font-medium">Facturas</span>
           </Link>
           <Link
             href="/panel/inventario"
-            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3 flex flex-col items-center gap-1 text-center transition-transform active:scale-[0.98]"
+            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3 md:p-5 flex flex-col items-center gap-1 text-center transition-transform active:scale-[0.98] hover:border-kaxa-200"
           >
             <span className="text-xl">📊</span>
-            <span className="text-xs font-medium">Stock</span>
+            <span className="text-xs md:text-sm font-medium">Stock</span>
           </Link>
           <Link
             href="/panel/caja"
-            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3 flex flex-col items-center gap-1 text-center transition-transform active:scale-[0.98]"
+            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3 md:p-5 flex flex-col items-center gap-1 text-center transition-transform active:scale-[0.98] hover:border-kaxa-200"
           >
             <span className="text-xl">🏦</span>
-            <span className="text-xs font-medium">Caja</span>
+            <span className="text-xs md:text-sm font-medium">Caja</span>
           </Link>
         </div>
       </div>

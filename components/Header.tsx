@@ -8,6 +8,8 @@ import { usePathname } from "next/navigation";
 // secciones en un menú lateral — reemplaza la barra de pestañas horizontal
 // de antes para no comerse tanta pantalla en el celular, todo el panel
 // queda un poco más de app y un poco menos de "pestañas de navegador".
+// Solo para móvil (md:hidden) — en pantallas de escritorio la navegación
+// vive en Sidebar.tsx, siempre visible a la izquierda.
 export default function Header({ negocio, rol }: { negocio: string; rol: string }) {
   const pathname = usePathname();
   const [menuAbierto, setMenuAbierto] = useState(false);
@@ -29,7 +31,7 @@ export default function Header({ negocio, rol }: { negocio: string; rol: string 
 
   return (
     <>
-      <header className="sticky top-0 z-20 bg-white/90 backdrop-blur border-b border-kaxa-100">
+      <header className="md:hidden sticky top-0 z-20 bg-white/90 backdrop-blur border-b border-kaxa-100">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
             <button
