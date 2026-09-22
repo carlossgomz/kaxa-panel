@@ -27,11 +27,16 @@ export type NegocioDirectorio = {
   turso_url: string;
   turso_token: string;
   edicion: string;
+  // Recargo por producto en delivery, en USD — solo Day Express lo tiene
+  // (0.10), configurado acá en el directorio y no en el código
+  // compartido, porque este panel se vende a otros clientes de Kaxa
+  // Avanzado que no deben tenerlo.
+  recargo_delivery_usd: number;
 };
 
 export async function buscarNegocio(slug: string): Promise<NegocioDirectorio | null> {
   const resultado = await obtenerDirectorio().execute({
-    sql: "SELECT slug, negocio, turso_url, turso_token, edicion FROM negocios WHERE slug = ?",
+    sql: "SELECT slug, negocio, turso_url, turso_token, edicion, recargo_delivery_usd FROM negocios WHERE slug = ?",
     args: [slug.trim().toLowerCase()]
   });
   const fila = resultado.rows[0];
@@ -41,6 +46,7 @@ export async function buscarNegocio(slug: string): Promise<NegocioDirectorio | n
     negocio: fila.negocio as string,
     turso_url: fila.turso_url as string,
     turso_token: fila.turso_token as string,
-    edicion: fila.edicion as string
+    edicion: fila.edicion as string,
+    recargo_delivery_usd: Number(fila.recargo_delivery_usd ?? 0)
   };
 }

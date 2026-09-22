@@ -14,20 +14,31 @@ function generarId() {
   return crypto.randomUUID();
 }
 
+// Producto placeholder "DELIVERY" que ya existe en la base de Day Express
+// (mismo id que PRODUCTO_DELIVERY_ID en pos-minimarket/src/screens/Venta.tsx)
+// — solo se usa cuando el negocio tiene recargoDeliveryUsd > 0, que hoy es
+// únicamente Day Express (configurado en la tabla negocios del directorio,
+// no acá), así que este id nunca se manda para otro cliente.
+const PRODUCTO_DELIVERY_ID = "f195fbac-103d-48fa-a27a-28371fba7745";
+
 export default function VentaClient({
   tasaHoy,
   repartidores,
   mostrarDelivery,
+  recargoDeliveryUsd,
 }: {
   tasaHoy: number;
   repartidores: Repartidor[];
   mostrarDelivery: boolean;
+  recargoDeliveryUsd: number;
 }) {
   const router = useRouter();
 
   // --- Delivery (genérico, igual que Venta.tsx de pos-avanzado — sin
   // ningún recargo automático, eso es una personalización propia de Day
   // Express que NO va acá, esto se vende tal cual a clientes de Avanzado).
+  // El recargo en sí (recargoDeliveryUsd) viene del directorio, configurado
+  // por negocio — en 0 para todos menos Day Express.
   const [esDelivery, setEsDelivery] = useState(false);
   const [repartidorId, setRepartidorId] = useState<string | null>(null);
 
@@ -113,7 +124,12 @@ export default function VentaClient({
   const [refNueva, setRefNueva] = useState("");
   const [mostrarDividir, setMostrarDividir] = useState(false);
 
-  const subtotal = carrito.reduce((acc, l) => acc + l.cantidad * l.precio_unit_bs, 0);
+  const subtotalCarrito = carrito.reduce((acc, l) => acc + l.cantidad * l.precio_unit_bs, 0);
+  // Mismo criterio que recargoDeliveryBs en Venta.tsx del escritorio: por
+  // producto entregado (sumando las cantidades del carrito), no por línea.
+  const totalUnidadesCarrito = carrito.reduce((acc, l) => acc + l.cantidad, 0);
+  const recargoDeliveryBs = esDelivery && recargoDeliveryUsd > 0 ? totalUnidadesCarrito * recargoDeliveryUsd * tasaHoy : 0;
+  const subtotal = subtotalCarrito + recargoDeliveryBs;
   const total = subtotal;
   const totalPagado = pagos.reduce((acc, p) => acc + p.monto_bs, 0);
   const restante = Number((total - totalPagado).toFixed(2));
@@ -185,6 +201,14 @@ export default function VentaClient({
     const pagosReales = [...pagos];
     if (esCredito) pagosReales.push({ metodo: "CREDITO", monto_bs: restante });
 
+    // Línea automática del recargo de delivery — se agrega sola al
+    // confirmar, igual que ejecutarVentaConfirmada() en Venta.tsx del
+    // escritorio, sin que el cajero tenga que buscarla a mano.
+    const items = carrito.map((l) => ({ producto_id: l.producto_id, cantidad: l.cantidad, precio_unit_bs: l.precio_unit_bs }));
+    if (recargoDeliveryBs > 0) {
+      items.push({ producto_id: PRODUCTO_DELIVERY_ID, cantidad: totalUnidadesCarrito, precio_unit_bs: recargoDeliveryUsd * tasaHoy });
+    }
+
     if (!idVentaRef.current) idVentaRef.current = generarId();
     setGuardando(true);
     try {
@@ -204,7 +228,7 @@ export default function VentaClient({
           total_bs: total,
           estado: esCredito ? "CREDITO_PENDIENTE" : "COMPLETADA",
           monto_pendiente_usd: esCredito ? restante / tasaHoy : null,
-          items: carrito.map((l) => ({ producto_id: l.producto_id, cantidad: l.cantidad, precio_unit_bs: l.precio_unit_bs })),
+          items,
           pagos: pagosReales,
         }),
       });
@@ -394,6 +418,14 @@ export default function VentaClient({
 
       {/* Pagos */}
       <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+        {recargoDeliveryBs > 0 && (
+          <div className="flex items-center justify-between text-sm text-gray-500 mb-2 pb-2 border-b border-kaxa-50">
+            <span>
+              Recargo de delivery ({totalUnidadesCarrito} × ${recargoDeliveryUsd.toFixed(2)})
+            </span>
+            <span className="font-medium">Bs {recargoDeliveryBs.toFixed(2)}</span>
+          </div>
+        )}
         <div className="flex items-center justify-between mb-3">
           <p className="text-sm text-gray-500">Total</p>
           <p className="text-xl font-semibold">Bs {total.toFixed(2)}</p>
