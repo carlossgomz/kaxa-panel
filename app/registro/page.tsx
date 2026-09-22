@@ -5,6 +5,7 @@ import Link from "next/link";
 
 export default function RegistroPage() {
   const [nombre, setNombre] = useState("");
+  const [apellido, setApellido] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -19,7 +20,7 @@ export default function RegistroPage() {
       const res = await fetch("/api/registro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre, email, password }),
+        body: JSON.stringify({ nombre: `${nombre.trim()} ${apellido.trim()}`.trim(), email, password }),
       });
       const datos = await res.json();
       if (!res.ok) {
@@ -63,11 +64,19 @@ export default function RegistroPage() {
         </div>
         <p className="text-sm text-gray-500 mb-6">Creá tu cuenta — después te vinculan al negocio.</p>
 
-        <label className="block text-sm font-medium mb-1">Tu nombre</label>
+        <label className="block text-sm font-medium mb-1">Nombre</label>
         <input
           className="w-full mb-4 rounded-lg border border-gray-300 px-3 py-2"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
+          required
+        />
+
+        <label className="block text-sm font-medium mb-1">Apellido</label>
+        <input
+          className="w-full mb-4 rounded-lg border border-gray-300 px-3 py-2"
+          value={apellido}
+          onChange={(e) => setApellido(e.target.value)}
           required
         />
 
