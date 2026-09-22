@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   const negocios = await negociosDeCuenta(cuenta.id);
   if (negocios.length === 0) {
     return NextResponse.json(
-      { error: "Tu cuenta todavía no está vinculada a ningún negocio. Pedile a quien lo administra que te vincule desde Cuentas, dentro del panel." },
+      { error: "Tu cuenta todavía no está vinculada a ningún negocio. Pídele a quien lo administra que te vincule desde Cuentas, dentro del panel." },
       { status: 403 }
     );
   }

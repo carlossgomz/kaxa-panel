@@ -106,7 +106,7 @@ export default function LoginPage() {
             </button>
 
             <p className="text-center text-sm text-gray-400 mt-4">
-              ¿No tenés cuenta? <Link href="/registro" className="text-kaxa-600 font-medium">Registrate</Link>
+              ¿No tienes cuenta? <Link href="/registro" className="text-kaxa-600 font-medium">Regístrate</Link>
             </p>
           </form>
         )}

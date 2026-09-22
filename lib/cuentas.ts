@@ -96,7 +96,7 @@ export async function desvincularCuenta(cuentaId: string, slug: string): Promise
 //  2. Email de alguien que todavía no se registró → link de un solo uso
 //     ATADO A ESE EMAIL (aunque se reenvíe o se filtre, solo lo puede
 //     completar esa persona).
-//  3. Sin email (no sabés quién se va a registrar todavía) → link
+//  3. Sin email (no se sabe quién se va a registrar todavía) → link
 //     "abierto": quien lo reciba se registra con el correo que quiera y
 //     queda vinculado igual, sin restricción de email.
 // En los tres casos el slug/creadoPor los resuelve quien llama a partir

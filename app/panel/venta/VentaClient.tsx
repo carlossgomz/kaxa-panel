@@ -240,7 +240,7 @@ export default function VentaClient({
       }
       setTicketConfirmado(datos.numero_ticket);
     } catch {
-      setMensaje("No se pudo conectar. Revisa tu internet e intenta de nuevo — podés volver a tocar \"Confirmar venta\", no se va a duplicar.");
+      setMensaje("No se pudo conectar. Revisa tu internet e intenta de nuevo — puedes volver a tocar \"Confirmar venta\", no se va a duplicar.");
     } finally {
       setGuardando(false);
     }
@@ -300,7 +300,7 @@ export default function VentaClient({
 
       {/* Carrito */}
       <div className="flex flex-col gap-2 mb-4">
-        {carrito.length === 0 && <p className="text-sm text-gray-400 text-center py-6">Buscá un producto para empezar.</p>}
+        {carrito.length === 0 && <p className="text-sm text-gray-400 text-center py-6">Busca un producto para empezar.</p>}
         {carrito.map((l) => (
           <div key={l.producto_id} className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3">
             <div className="flex items-center justify-between">

@@ -13,11 +13,11 @@ export async function DELETE(req: NextRequest) {
   const { cuentaId } = await req.json();
   if (!cuentaId) return NextResponse.json({ error: "Falta la cuenta." }, { status: 400 });
 
-  // No te podés desvincular a vos mismo — evita que un admin se quede
+  // No puedes desvincularte a ti mismo — evita que un admin se quede
   // afuera de su propio negocio sin querer (y sin nadie más que lo
   // vuelva a vincular).
   if (cuentaId === sesion.usuarioId) {
-    return NextResponse.json({ error: "No te podés desvincular a vos mismo." }, { status: 400 });
+    return NextResponse.json({ error: "No puedes desvincularte a ti mismo." }, { status: 400 });
   }
 
   await desvincularCuenta(cuentaId, sesion.slug);
