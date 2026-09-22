@@ -31,12 +31,12 @@ export async function POST(req: NextRequest) {
 
     if (!invite) return NextResponse.json({ ok: true, vinculado: null });
 
-    const vinculado = await usarInvitacion(invite, resultado.id);
+    const vinculado = await usarInvitacion(invite, resultado.id, email);
     if (!vinculado) {
-      // La cuenta ya se creó igual — el link estaba vencido, ya usado, o
-      // no existía. No se pierde el registro por esto, solo no queda
-      // vinculado automáticamente.
-      return NextResponse.json({ ok: true, vinculado: null, avisoInvitacion: "El link de invitación ya no es válido — pedile uno nuevo a quien te invitó." });
+      // La cuenta ya se creó igual — el link estaba vencido, ya usado, no
+      // existía, o el email no coincide con el invitado. No se pierde el
+      // registro por esto, solo no queda vinculado automáticamente.
+      return NextResponse.json({ ok: true, vinculado: null, avisoInvitacion: "El link de invitación ya no es válido para este email — pedile uno nuevo a quien te invitó." });
     }
     return NextResponse.json({ ok: true, vinculado });
   } catch {

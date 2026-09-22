@@ -16,7 +16,7 @@ export default function RegistroPage() {
 
 function RegistroForm() {
   const invite = useSearchParams().get("invite");
-  const [invitacionInfo, setInvitacionInfo] = useState<{ negocio: string; rol: string } | { error: true } | null>(null);
+  const [invitacionInfo, setInvitacionInfo] = useState<{ negocio: string; rol: string; email: string } | { error: true } | null>(null);
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
   const [email, setEmail] = useState("");
@@ -32,7 +32,11 @@ function RegistroForm() {
     if (!invite) return;
     fetch(`/api/invitaciones?token=${encodeURIComponent(invite)}`)
       .then((r) => r.json())
-      .then((datos) => setInvitacionInfo(datos.negocio ? { negocio: datos.negocio, rol: datos.rol } : { error: true }))
+      .then((datos) => {
+        if (!datos.negocio) return setInvitacionInfo({ error: true });
+        setInvitacionInfo({ negocio: datos.negocio, rol: datos.rol, email: datos.email });
+        setEmail(datos.email);
+      })
       .catch(() => setInvitacionInfo({ error: true }));
   }, [invite]);
 
@@ -133,9 +137,10 @@ function RegistroForm() {
         <label className="block text-sm font-medium mb-1">Email</label>
         <input
           type="email"
-          className="w-full mb-4 rounded-lg border border-gray-300 px-3 py-2"
+          className="w-full mb-4 rounded-lg border border-gray-300 px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          disabled={!!invitacionInfo && "negocio" in invitacionInfo}
           required
         />
 
