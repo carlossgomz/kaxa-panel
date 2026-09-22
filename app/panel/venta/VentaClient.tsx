@@ -8,13 +8,28 @@ type ProductoResultado = { id: string; codigo_barra: string; nombre: string; sto
 type LineaCarrito = { producto_id: string; codigo_barra: string; nombre: string; cantidad: number; precio_unit_bs: number; stock_actual: number };
 type ClienteResultado = { id: string; nombre: string; cedula: string; direccion: string | null; credito_autorizado: boolean };
 type LineaPago = { metodo: string; monto_bs: number; referencia?: string };
+type Repartidor = { id: string; nombre: string };
 
 function generarId() {
   return crypto.randomUUID();
 }
 
-export default function VentaClient({ tasaHoy }: { tasaHoy: number }) {
+export default function VentaClient({
+  tasaHoy,
+  repartidores,
+  mostrarDelivery,
+}: {
+  tasaHoy: number;
+  repartidores: Repartidor[];
+  mostrarDelivery: boolean;
+}) {
   const router = useRouter();
+
+  // --- Delivery (genérico, igual que Venta.tsx de pos-avanzado — sin
+  // ningún recargo automático, eso es una personalización propia de Day
+  // Express que NO va acá, esto se vende tal cual a clientes de Avanzado).
+  const [esDelivery, setEsDelivery] = useState(false);
+  const [repartidorId, setRepartidorId] = useState<string | null>(null);
 
   // --- Búsqueda y carrito ---
   const [busqueda, setBusqueda] = useState("");
@@ -131,6 +146,8 @@ export default function VentaClient({ tasaHoy }: { tasaHoy: number }) {
     setCarrito([]);
     setPagos([]);
     setCliente(null);
+    setEsDelivery(false);
+    setRepartidorId(null);
     setMensaje(null);
     setTicketConfirmado(null);
     idVentaRef.current = null;
@@ -180,6 +197,8 @@ export default function VentaClient({ tasaHoy }: { tasaHoy: number }) {
           cliente_nombre: cliente?.nombre || null,
           cliente_cedula: cliente?.cedula || null,
           cliente_direccion: cliente?.direccion || null,
+          canal: esDelivery ? "DELIVERY" : "TIENDA",
+          repartidor_id: esDelivery ? repartidorId : null,
           tasa_cambio_dia: tasaHoy,
           subtotal_bs: subtotal,
           total_bs: total,
@@ -341,6 +360,37 @@ export default function VentaClient({ tasaHoy }: { tasaHoy: number }) {
           </button>
         )}
       </div>
+
+      {/* Delivery (si el negocio no la desactivó desde Configuración) */}
+      {mostrarDelivery && (
+        <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+          <label className="flex items-center gap-2 text-sm font-medium">
+            <input
+              type="checkbox"
+              checked={esDelivery}
+              onChange={(e) => {
+                setEsDelivery(e.target.checked);
+                if (!e.target.checked) setRepartidorId(null);
+              }}
+            />
+            🛵 Es delivery
+          </label>
+          {esDelivery && (
+            <select
+              value={repartidorId ?? ""}
+              onChange={(e) => setRepartidorId(e.target.value || null)}
+              className="w-full mt-3 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+            >
+              <option value="">Repartidor (opcional, se puede asignar después)…</option>
+              {repartidores.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.nombre}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+      )}
 
       {/* Pagos */}
       <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">

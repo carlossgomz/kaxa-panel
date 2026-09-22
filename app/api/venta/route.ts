@@ -37,6 +37,8 @@ export async function POST(req: NextRequest) {
     cliente_nombre,
     cliente_cedula,
     cliente_direccion,
+    canal,
+    repartidor_id,
     tasa_cambio_dia,
     subtotal_bs,
     total_bs,
@@ -50,6 +52,8 @@ export async function POST(req: NextRequest) {
     cliente_nombre: string | null;
     cliente_cedula: string | null;
     cliente_direccion: string | null;
+    canal?: string | null;
+    repartidor_id?: string | null;
     tasa_cambio_dia: number;
     subtotal_bs: number;
     total_bs: number;
@@ -121,7 +125,7 @@ export async function POST(req: NextRequest) {
 
     await tx.execute({
       sql: `INSERT INTO ventas (id, numero_ticket, fecha_hora, cliente_nombre, cliente_cedula, cliente_direccion, vendedor_id, vendedor_nombre, tasa_cambio_dia, subtotal_bs, iva_bs, total_bs, estado, monto_pendiente_usd, canal, pedido_delivery_id, repartidor_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, 'TIENDA', NULL, NULL)`,
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?, ?, NULL, ?)`,
       args: [
         id,
         numeroTicket,
@@ -136,6 +140,8 @@ export async function POST(req: NextRequest) {
         total_bs,
         estado,
         monto_pendiente_usd ?? null,
+        canal === "DELIVERY" ? "DELIVERY" : "TIENDA",
+        canal === "DELIVERY" ? repartidor_id || null : null,
       ],
     });
 
