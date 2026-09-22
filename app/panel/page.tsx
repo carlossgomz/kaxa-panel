@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { obtenerSesion } from "@/lib/auth";
 import { buscarNegocio } from "@/lib/directorio";
 import { clienteTurso } from "@/lib/turso";
+import NavTabs from "@/components/NavTabs";
 
 async function totalPeriodo(db: ReturnType<typeof clienteTurso>, condicionFecha: string) {
   const r = await db.execute(
@@ -85,7 +87,7 @@ export default async function PanelPage() {
   ];
 
   return (
-    <main className="min-h-screen px-4 py-8 max-w-md mx-auto">
+    <main className="min-h-screen px-4 py-8 pb-28 max-w-md mx-auto">
       <div className="flex items-center gap-2 mb-1">
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-kaxa-400 to-kaxa-900 flex items-center justify-center text-white font-bold text-sm">
           K
@@ -106,12 +108,12 @@ export default async function PanelPage() {
           </div>
         ))}
 
-        <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5">
+        <Link href="/panel/cobrar" className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5 block">
           <p className="text-sm text-gray-500">Cuentas por cobrar</p>
           <p className="text-2xl font-semibold mt-1">USD {deudaUsd.toFixed(2)}</p>
           <p className="text-sm text-kaxa-600 font-medium">Bs {(deudaUsd * tasa).toFixed(2)}</p>
-          <p className="text-xs text-gray-400 mt-2">Lo que te deben tus clientes a crédito, a hoy</p>
-        </div>
+          <p className="text-xs text-gray-400 mt-2">Lo que te deben tus clientes a crédito, a hoy — toca para ver el detalle</p>
+        </Link>
 
         <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5">
           <p className="text-sm text-gray-500">Producto más vendido este mes</p>
@@ -129,6 +131,8 @@ export default async function PanelPage() {
       <form action="/api/logout" method="post" className="mt-8">
         <button className="text-sm text-gray-500 underline">cerrar sesión</button>
       </form>
+
+      <NavTabs rol={sesion.rol} />
     </main>
   );
 }
