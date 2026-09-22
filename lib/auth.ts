@@ -1,12 +1,25 @@
 import { cookies } from "next/headers";
-import { createHash, createHmac, timingSafeEqual } from "crypto";
+import { createHmac, randomBytes, scryptSync, timingSafeEqual } from "crypto";
 
-// Mismo hash que ya usa el escritorio (src/auth.ts: SHA-256 sin sal vía
-// Web Crypto) — reproducido acá con el módulo crypto de Node, para poder
-// validar la contraseña contra la MISMA tabla usuarios de la base del
-// cliente, sin tocar nada del programa de escritorio.
-export function hashPassword(password: string): string {
-  return createHash("sha256").update(password).digest("hex");
+// Contraseñas de las cuentas del panel (lib/cuentas.ts) — un sistema de
+// login propio, separado del usuario/clave del programa de escritorio
+// (una cuenta de panel puede no tener ningún usuario en el escritorio, y
+// viceversa). scrypt con sal por cuenta, no el SHA-256 sin sal que usa el
+// escritorio — acá no hace falta esa compatibilidad porque es una tabla
+// de credenciales nueva, así que se usa algo más fuerte contra fuerza
+// bruta/rainbow tables.
+export function hashPasswordCuenta(password: string): string {
+  const sal = randomBytes(16).toString("hex");
+  const hash = scryptSync(password, sal, 64).toString("hex");
+  return `${sal}:${hash}`;
+}
+
+export function verificarPasswordCuenta(password: string, guardado: string): boolean {
+  const [sal, hashGuardado] = guardado.split(":");
+  if (!sal || !hashGuardado) return false;
+  const hash = scryptSync(password, sal, 64);
+  const esperado = Buffer.from(hashGuardado, "hex");
+  return hash.length === esperado.length && timingSafeEqual(hash, esperado);
 }
 
 const COOKIE = "kaxa_session";

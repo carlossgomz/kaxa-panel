@@ -1,44 +1,62 @@
 import { NextRequest, NextResponse } from "next/server";
 import { buscarNegocio } from "@/lib/directorio";
-import { clienteTurso } from "@/lib/turso";
-import { fijarSesion, hashPassword } from "@/lib/auth";
+import { buscarCuentaPorEmail, negociosDeCuenta } from "@/lib/cuentas";
+import { fijarSesion, verificarPasswordCuenta } from "@/lib/auth";
 
+// Login por email/contraseña de la CUENTA del panel (lib/cuentas.ts), ya
+// no por código de negocio + usuario del escritorio — una cuenta se
+// vincula a uno o más negocios desde app/panel/cuentas, así que acá solo
+// hace falta resolver a cuál entrar. Mismo mensaje de error genérico para
+// "no existe ese email" y "contraseña incorrecta", para no revelar con un
+// intento si un email está registrado o no.
 export async function POST(req: NextRequest) {
-  const { slug, usuario, password } = await req.json();
-  if (!slug || !usuario || !password) {
+  const { email, password, slug } = await req.json();
+  if (!email || !password) {
     return NextResponse.json({ error: "Faltan datos." }, { status: 400 });
   }
 
-  const negocio = await buscarNegocio(slug);
-  if (!negocio) {
-    return NextResponse.json({ error: "No encontramos ese código de negocio." }, { status: 401 });
+  const cuenta = await buscarCuentaPorEmail(email);
+  if (!cuenta || !verificarPasswordCuenta(password, cuenta.password_hash)) {
+    return NextResponse.json({ error: "Email o contraseña incorrectos." }, { status: 401 });
   }
-  if (negocio.edicion !== "avanzado") {
+
+  const negocios = await negociosDeCuenta(cuenta.id);
+  if (negocios.length === 0) {
+    return NextResponse.json(
+      { error: "Tu cuenta todavía no está vinculada a ningún negocio. Pedile a quien lo administra que te vincule desde Cuentas, dentro del panel." },
+      { status: 403 }
+    );
+  }
+
+  // Más de un negocio vinculado y todavía no eligió cuál: se le devuelve
+  // la lista para que el login (cliente) muestre un selector y vuelva a
+  // mandar el mismo email/password con el slug elegido — no se guarda
+  // ninguna sesión intermedia sin negocio resuelto.
+  let elegido = negocios[0];
+  if (negocios.length > 1) {
+    if (!slug) {
+      return NextResponse.json({ elegirNegocio: negocios.map((n) => ({ slug: n.slug, negocio: n.negocio })) });
+    }
+    const match = negocios.find((n) => n.slug === slug);
+    if (!match) return NextResponse.json({ error: "Ese negocio no está vinculado a tu cuenta." }, { status: 403 });
+    elegido = match;
+  }
+
+  const negocioInfo = await buscarNegocio(elegido.slug);
+  if (!negocioInfo) return NextResponse.json({ error: "No se encontró el negocio." }, { status: 500 });
+  if (negocioInfo.edicion !== "avanzado") {
     return NextResponse.json(
       { error: "El panel web es exclusivo de Kaxa Avanzado. Escríbenos para actualizar tu plan." },
       { status: 403 }
     );
   }
 
-  // Misma consulta que src/screens/Login.tsx del escritorio, contra la
-  // base de ESE cliente — el panel no tiene sus propias cuentas, usa las
-  // mismas que ya existen en Kaxa.
-  const db = clienteTurso(negocio.turso_url, negocio.turso_token);
-  const resultado = await db.execute({
-    sql: "SELECT id, nombre, rol, activo, password_hash FROM usuarios WHERE usuario = ? AND activo = 1",
-    args: [usuario.trim()]
-  });
-  const fila = resultado.rows[0];
-  if (!fila || fila.password_hash !== hashPassword(password)) {
-    return NextResponse.json({ error: "Usuario o contraseña incorrectos." }, { status: 401 });
-  }
-
   await fijarSesion({
-    slug: negocio.slug,
-    negocio: negocio.negocio,
-    rol: fila.rol as string,
-    usuarioId: String(fila.id),
-    usuarioNombre: String(fila.nombre)
+    slug: elegido.slug,
+    negocio: elegido.negocio,
+    rol: elegido.rol,
+    usuarioId: cuenta.id,
+    usuarioNombre: cuenta.nombre
   });
   return NextResponse.json({ ok: true });
 }

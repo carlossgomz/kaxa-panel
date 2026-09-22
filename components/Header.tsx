@@ -27,6 +27,7 @@ export default function Header({ negocio, rol }: { negocio: string; rol: string 
     { href: "/panel/facturas", label: "Facturas", icono: "🧾" },
     { href: "/panel/inventario", label: "Stock", icono: "📊" },
     { href: "/panel/caja", label: "Caja", icono: "🏦" },
+    ...(rol === "ADMIN" ? [{ href: "/panel/cuentas", label: "Cuentas", icono: "👥" }] : []),
   ];
 
   return (
