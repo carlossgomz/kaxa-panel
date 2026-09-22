@@ -16,7 +16,7 @@ export default function RegistroPage() {
 
 function RegistroForm() {
   const invite = useSearchParams().get("invite");
-  const [invitacionInfo, setInvitacionInfo] = useState<{ negocio: string; rol: string; email: string } | { error: true } | null>(null);
+  const [invitacionInfo, setInvitacionInfo] = useState<{ negocio: string; rol: string; email: string | null } | { error: true } | null>(null);
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
   const [email, setEmail] = useState("");
@@ -34,8 +34,8 @@ function RegistroForm() {
       .then((r) => r.json())
       .then((datos) => {
         if (!datos.negocio) return setInvitacionInfo({ error: true });
-        setInvitacionInfo({ negocio: datos.negocio, rol: datos.rol, email: datos.email });
-        setEmail(datos.email);
+        setInvitacionInfo({ negocio: datos.negocio, rol: datos.rol, email: datos.email ?? null });
+        if (datos.email) setEmail(datos.email);
       })
       .catch(() => setInvitacionInfo({ error: true }));
   }, [invite]);
@@ -78,12 +78,12 @@ function RegistroForm() {
           {vinculado ? (
             <p className="text-sm text-gray-500 mb-6">
               Ya quedaste vinculado a <span className="font-medium">{vinculado.negocio}</span> como{" "}
-              {vinculado.rol === "ADMIN" ? "administrador" : "cajero"}. Ya podés iniciar sesión.
+              {vinculado.rol === "ADMIN" ? "administrador" : "cajero"}. Ya puedes iniciar sesión.
             </p>
           ) : (
             <p className="text-sm text-gray-500 mb-6">
               {avisoInvitacion ? `${avisoInvitacion} ` : ""}
-              Pedile a quien administra el negocio en Kaxa que te vincule desde Cuentas, dentro del panel, con este
+              Pídele a quien administra el negocio en Kaxa que te vincule desde Cuentas, dentro del panel, con este
               email: <span className="font-medium">{email}</span>
             </p>
           )}
@@ -107,15 +107,15 @@ function RegistroForm() {
         {invitacionInfo && "negocio" in invitacionInfo ? (
           <p className="text-sm bg-kaxa-50 text-kaxa-700 rounded-lg px-3 py-2 mb-6">
             Te invitaron a <span className="font-medium">{invitacionInfo.negocio}</span> como{" "}
-            {invitacionInfo.rol === "ADMIN" ? "administrador" : "cajero"} — al crear tu cuenta quedás vinculado directo.
+            {invitacionInfo.rol === "ADMIN" ? "administrador" : "cajero"} — al crear tu cuenta quedas vinculado directo.
           </p>
         ) : invitacionInfo && "error" in invitacionInfo ? (
           <p className="text-sm bg-red-50 text-red-600 rounded-lg px-3 py-2 mb-6">
-            Ese link de invitación ya no es válido (vencido o ya usado) — podés registrarte igual, pero te van a tener
-            que vincular a mano después.
+            Ese link de invitación ya no es válido (vencido o ya usado) — puedes registrarte igual, pero luego
+            tendrán que vincularte a mano.
           </p>
         ) : (
-          <p className="text-sm text-gray-500 mb-6">Creá tu cuenta — después te vinculan al negocio.</p>
+          <p className="text-sm text-gray-500 mb-6">Crea tu cuenta — después te vinculan al negocio.</p>
         )}
 
         <label className="block text-sm font-medium mb-1">Nombre</label>
@@ -140,7 +140,7 @@ function RegistroForm() {
           className="w-full mb-4 rounded-lg border border-gray-300 px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          disabled={!!invitacionInfo && "negocio" in invitacionInfo}
+          disabled={!!invitacionInfo && "negocio" in invitacionInfo && invitacionInfo.email !== null}
           required
         />
 
@@ -176,7 +176,7 @@ function RegistroForm() {
         </button>
 
         <p className="text-center text-sm text-gray-400 mt-4">
-          ¿Ya tenés cuenta? <Link href="/login" className="text-kaxa-600 font-medium">Iniciar sesión</Link>
+          ¿Ya tienes cuenta? <Link href="/login" className="text-kaxa-600 font-medium">Iniciar sesión</Link>
         </p>
       </form>
     </main>

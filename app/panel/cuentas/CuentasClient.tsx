@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 type CuentaVinculada = { cuentaId: string; email: string; nombre: string; rol: string };
-type Invitacion = { token: string; email: string; rol: string; expiraAt: string };
+type Invitacion = { token: string; email: string | null; rol: string; expiraAt: string };
 
 function etiquetaRol(rol: string) {
   return rol === "ADMIN" ? "administrador" : "cajero";
@@ -56,6 +56,7 @@ export default function CuentasClient({
         setMensaje(`${email} ya tenía cuenta — quedó vinculado como ${etiquetaRol(datos.rol)}.`);
       } else {
         setLinkGenerado(`${window.location.origin}/registro?invite=${datos.token}`);
+        setMensaje(email ? "Se generó el link — esa persona todavía no tenía cuenta." : "Se generó un link abierto.");
       }
       setEmail("");
       router.refresh();
@@ -99,8 +100,9 @@ export default function CuentasClient({
     <div>
       <h1 className="text-xl font-semibold mb-1">Cuentas</h1>
       <p className="text-sm text-gray-500 mb-6">
-        Quién puede entrar al panel de este negocio. Si el email ya tiene cuenta, queda vinculado al toque; si no, te
-        doy un link para que se registre y quede vinculado solo.
+        Quién puede entrar al panel de este negocio. Si escribes el email de alguien que ya tiene cuenta, queda
+        vinculado al momento; si no tiene cuenta o dejas el email en blanco, se genera un link para registrarse y
+        quedar vinculado automáticamente.
       </p>
 
       <form onSubmit={invitar} className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-6 flex flex-col gap-3">
@@ -109,9 +111,8 @@ export default function CuentasClient({
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email de la persona"
+          placeholder="Email de la persona (opcional)"
           className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
-          required
         />
         <select value={rol} onChange={(e) => setRol(e.target.value as "ADMIN" | "CAJERO")} className="rounded-lg border border-gray-300 px-3 py-2 text-sm">
           <option value="CAJERO">Cajero — solo Venta, Facturas, Cuentas por cobrar</option>
@@ -132,9 +133,9 @@ export default function CuentasClient({
           disabled={cargando}
           className="rounded-lg bg-kaxa-600 text-white font-medium py-2.5 text-sm transition-transform active:scale-[0.98] disabled:opacity-60"
         >
-          {cargando ? "Generando…" : "Generar link"}
+          {cargando ? "Procesando…" : "Invitar"}
         </button>
-        <p className="text-xs text-gray-400">El link vale por 7 días y se gasta al usarse una vez.</p>
+        <p className="text-xs text-gray-400">Cuando se genera un link, vale por 7 días y se gasta al usarse una vez.</p>
       </form>
 
       {invitaciones.length > 0 && (
@@ -143,7 +144,7 @@ export default function CuentasClient({
           {invitaciones.map((inv) => (
             <div key={inv.token} className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3 flex items-center justify-between">
               <div className="min-w-0">
-                <p className="text-sm font-medium truncate">{inv.email}</p>
+                <p className="text-sm font-medium truncate">{inv.email ?? "Link abierto (cualquier email)"}</p>
                 <p className="text-xs text-gray-400">
                   {etiquetaRol(inv.rol)} · vence {new Date(inv.expiraAt).toLocaleDateString("es-VE")}
                 </p>
@@ -171,7 +172,7 @@ export default function CuentasClient({
               <p className="text-sm font-medium truncate">{c.nombre}</p>
               <p className="text-xs text-gray-400 truncate">
                 {c.email} · {etiquetaRol(c.rol)}
-                {c.cuentaId === cuentaIdPropia && " · vos"}
+                {c.cuentaId === cuentaIdPropia && " · tú"}
               </p>
             </div>
             {c.cuentaId !== cuentaIdPropia && (

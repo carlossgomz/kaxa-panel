@@ -90,33 +90,37 @@ export async function desvincularCuenta(cuentaId: string, slug: string): Promise
   });
 }
 
-// --- Invitaciones: un solo campo (email) hace las dos cosas. Si ese
-// email ya tiene cuenta, se vincula al toque, sin link ni nada. Si no,
-// se genera un link de un solo uso ATADO A ESE EMAIL — no un link
-// genérico que sirva para cualquiera que lo consiga, así que aunque se
-// reenvíe o se filtre, solo lo puede completar esa persona (se compara
-// el email al registrarse). El token es la única prueba de que alguien
-// fue invitado por un admin de ESE negocio, por eso es impredecible
-// (randomUUID) y de un solo uso.
-export type Invitacion = { token: string; slug: string; negocio: string; rol: string; email: string; expiraAt: string };
+// --- Invitaciones: el campo de email es OPCIONAL y hace tres cosas
+// distintas según el caso:
+//  1. Email de una cuenta que YA existe → se vincula al toque, sin link.
+//  2. Email de alguien que todavía no se registró → link de un solo uso
+//     ATADO A ESE EMAIL (aunque se reenvíe o se filtre, solo lo puede
+//     completar esa persona).
+//  3. Sin email (no sabés quién se va a registrar todavía) → link
+//     "abierto": quien lo reciba se registra con el correo que quiera y
+//     queda vinculado igual, sin restricción de email.
+// En los tres casos el slug/creadoPor los resuelve quien llama a partir
+// de la sesión del admin (nunca un dato que mande el cliente), y el
+// token es la única prueba de que alguien fue invitado por un admin de
+// ESE negocio — por eso es impredecible (randomUUID) y de un solo uso.
+export type Invitacion = { token: string; slug: string; negocio: string; rol: string; email: string | null; expiraAt: string };
 export type ResultadoInvitar = { vinculadoDirecto: true; negocio: string; rol: string } | { vinculadoDirecto: false; token: string };
 
 const DIAS_EXPIRACION_INVITACION = 7;
 
-// El slug/creadoPor los resuelve quien llama a partir de la sesión del
-// admin — mismo motivo que en vincularCuenta: nunca confiar en un slug
-// que mande el cliente.
-export async function invitarOVincular(email: string, slug: string, negocio: string, rol: string, creadoPor: string): Promise<ResultadoInvitar> {
-  const cuenta = await buscarCuentaPorEmail(email);
-  if (cuenta) {
-    await vincularCuentaId(cuenta.id, slug, rol);
-    return { vinculadoDirecto: true, negocio, rol };
+export async function invitarOVincular(email: string | null, slug: string, negocio: string, rol: string, creadoPor: string): Promise<ResultadoInvitar> {
+  if (email) {
+    const cuenta = await buscarCuentaPorEmail(email);
+    if (cuenta) {
+      await vincularCuentaId(cuenta.id, slug, rol);
+      return { vinculadoDirecto: true, negocio, rol };
+    }
   }
   const token = randomUUID();
   const expiraAt = new Date(Date.now() + DIAS_EXPIRACION_INVITACION * 24 * 3600 * 1000).toISOString();
   await obtenerDirectorio().execute({
     sql: "INSERT INTO invitaciones (token, slug, rol, email, creado_por, expira_at) VALUES (?, ?, ?, ?, ?, ?)",
-    args: [token, slug, rol, emailNormalizado(email), creadoPor, expiraAt]
+    args: [token, slug, rol, email ? emailNormalizado(email) : null, creadoPor, expiraAt]
   });
   return { vinculadoDirecto: false, token };
 }
@@ -136,7 +140,7 @@ export async function invitacionesPendientes(slug: string): Promise<Invitacion[]
     slug: String(f.slug),
     negocio: String(f.negocio),
     rol: String(f.rol),
-    email: String(f.email),
+    email: f.email == null ? null : String(f.email),
     expiraAt: String(f.expira_at)
   }));
 }
@@ -148,7 +152,7 @@ export async function revocarInvitacion(token: string, slug: string): Promise<vo
   });
 }
 
-export async function buscarInvitacionValida(token: string): Promise<{ slug: string; negocio: string; rol: string; email: string } | null> {
+export async function buscarInvitacionValida(token: string): Promise<{ slug: string; negocio: string; rol: string; email: string | null } | null> {
   const r = await obtenerDirectorio().execute({
     sql: `SELECT i.slug, n.negocio, i.rol, i.email
           FROM invitaciones i JOIN negocios n ON n.slug = i.slug
@@ -157,18 +161,21 @@ export async function buscarInvitacionValida(token: string): Promise<{ slug: str
   });
   const f = r.rows[0];
   if (!f) return null;
-  return { slug: String(f.slug), negocio: String(f.negocio), rol: String(f.rol), email: String(f.email) };
+  return { slug: String(f.slug), negocio: String(f.negocio), rol: String(f.rol), email: f.email == null ? null : String(f.email) };
 }
 
 // Consume la invitación y vincula de una — el UPDATE con "usado_por IS
 // NULL" en el WHERE es lo que hace que sea de un solo uso incluso si dos
 // pedidos llegan casi al mismo tiempo (el segundo actualiza 0 filas y se
-// entera de que ya se usó). Rechaza si el email con el que se registró no
-// es el mismo al que se invitó — si no, cualquiera que consiga el link
-// podría registrarse con SU PROPIO email y quedar vinculado igual.
+// entera de que ya se usó). Si la invitación tiene un email asignado,
+// tiene que coincidir con el que se usó para registrarse — si no,
+// cualquiera que consiga el link podría registrarse con SU PROPIO email
+// y quedar vinculado igual. Si NO tiene email asignado (link abierto),
+// no hay nada que comparar: vale para cualquier email.
 export async function usarInvitacion(token: string, cuentaId: string, emailRegistrado: string): Promise<{ slug: string; negocio: string; rol: string } | null> {
   const invitacion = await buscarInvitacionValida(token);
-  if (!invitacion || invitacion.email !== emailNormalizado(emailRegistrado)) return null;
+  if (!invitacion) return null;
+  if (invitacion.email !== null && invitacion.email !== emailNormalizado(emailRegistrado)) return null;
   const r = await obtenerDirectorio().execute({
     sql: "UPDATE invitaciones SET usado_por = ?, usado_at = datetime('now') WHERE token = ? AND usado_por IS NULL",
     args: [cuentaId, token]
