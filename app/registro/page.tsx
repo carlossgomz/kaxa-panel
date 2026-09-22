@@ -8,6 +8,7 @@ export default function RegistroPage() {
   const [apellido, setApellido] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmarPassword, setConfirmarPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [listo, setListo] = useState(false);
   const [cargando, setCargando] = useState(false);
@@ -15,6 +16,10 @@ export default function RegistroPage() {
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    if (password !== confirmarPassword) {
+      setError("Las contraseñas no coinciden.");
+      return;
+    }
     setCargando(true);
     try {
       const res = await fetch("/api/registro", {
@@ -98,7 +103,17 @@ export default function RegistroPage() {
           minLength={6}
           required
         />
-        <p className="text-xs text-gray-400 mb-5">Al menos 6 caracteres.</p>
+        <p className="text-xs text-gray-400 mb-4">Al menos 6 caracteres.</p>
+
+        <label className="block text-sm font-medium mb-1">Confirmar contraseña</label>
+        <input
+          type="password"
+          className="w-full mb-5 rounded-lg border border-gray-300 px-3 py-2"
+          value={confirmarPassword}
+          onChange={(e) => setConfirmarPassword(e.target.value)}
+          minLength={6}
+          required
+        />
 
         {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
 
