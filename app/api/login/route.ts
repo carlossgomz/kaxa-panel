@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   // mismas que ya existen en Kaxa.
   const db = clienteTurso(negocio.turso_url, negocio.turso_token);
   const resultado = await db.execute({
-    sql: "SELECT rol, activo, password_hash FROM usuarios WHERE usuario = ? AND activo = 1",
+    sql: "SELECT id, nombre, rol, activo, password_hash FROM usuarios WHERE usuario = ? AND activo = 1",
     args: [usuario.trim()]
   });
   const fila = resultado.rows[0];
@@ -33,6 +33,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Usuario o contraseña incorrectos." }, { status: 401 });
   }
 
-  await fijarSesion({ slug: negocio.slug, negocio: negocio.negocio, rol: fila.rol as string });
+  await fijarSesion({
+    slug: negocio.slug,
+    negocio: negocio.negocio,
+    rol: fila.rol as string,
+    usuarioId: String(fila.id),
+    usuarioNombre: String(fila.nombre)
+  });
   return NextResponse.json({ ok: true });
 }

@@ -77,7 +77,14 @@ export default async function PanelPage() {
   return (
     <div>
       <h1 className="text-xl font-semibold mb-1">Hola 👋</h1>
-      <p className="text-sm text-gray-500 mb-6">Así va {nombreNegocio} ahora mismo.</p>
+      <p className="text-sm text-gray-500 mb-4">Así va {nombreNegocio} ahora mismo.</p>
+
+      <Link
+        href="/panel/venta"
+        className="flex items-center justify-center gap-2 rounded-2xl bg-kaxa-600 text-white font-semibold py-4 mb-4 shadow-sm transition-transform active:scale-[0.98]"
+      >
+        🛒 Nueva venta
+      </Link>
 
       <div className="grid grid-cols-1 gap-3">
         <div className="grid grid-cols-3 gap-2">

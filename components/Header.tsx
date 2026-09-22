@@ -11,6 +11,7 @@ export default function Header({ negocio, rol }: { negocio: string; rol: string 
   const pathname = usePathname();
 
   const tabs = [
+    { href: "/panel/venta", label: "Venta", icono: "🛒" },
     { href: "/panel", label: "Inicio", icono: "🏠" },
     { href: "/panel/cobrar", label: "Cobrar", icono: "💵" },
     ...(rol === "ADMIN" ? [{ href: "/panel/pagar", label: "Pagar", icono: "📦" }] : []),

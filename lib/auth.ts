@@ -11,7 +11,7 @@ export function hashPassword(password: string): string {
 
 const COOKIE = "kaxa_session";
 
-export type Sesion = { slug: string; negocio: string; rol: string };
+export type Sesion = { slug: string; negocio: string; rol: string; usuarioId: string; usuarioNombre: string };
 
 // A diferencia de delivery-app (un solo negocio, la cookie solo distingue
 // "admin" de "delivery"), acá la cookie también dice A QUÉ NEGOCIO
