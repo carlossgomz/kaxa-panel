@@ -75,6 +75,14 @@ export async function cuentasVinculadas(slug: string): Promise<CuentaVinculada[]
   return r.rows.map((f) => ({ cuentaId: String(f.id), email: String(f.email), nombre: String(f.nombre), rol: String(f.rol) }));
 }
 
+async function vincularCuentaId(cuentaId: string, slug: string, rol: string): Promise<void> {
+  await obtenerDirectorio().execute({
+    sql: `INSERT INTO cuenta_negocio (cuenta_id, slug, rol) VALUES (?, ?, ?)
+          ON CONFLICT (cuenta_id, slug) DO UPDATE SET rol = excluded.rol`,
+    args: [cuentaId, slug, rol]
+  });
+}
+
 // Vincula una cuenta YA REGISTRADA (por email) a un negocio. El slug lo
 // tiene que resolver quien llama a partir de la SESIÓN del admin que está
 // vinculando (nunca de un dato que mande el cliente) — si no, cualquiera
@@ -82,11 +90,7 @@ export async function cuentasVinculadas(slug: string): Promise<CuentaVinculada[]
 export async function vincularCuenta(email: string, slug: string, rol: string): Promise<{ ok: true } | { error: string }> {
   const cuenta = await buscarCuentaPorEmail(email);
   if (!cuenta) return { error: "No existe ninguna cuenta registrada con ese email — primero tiene que crearla en /registro." };
-  await obtenerDirectorio().execute({
-    sql: `INSERT INTO cuenta_negocio (cuenta_id, slug, rol) VALUES (?, ?, ?)
-          ON CONFLICT (cuenta_id, slug) DO UPDATE SET rol = excluded.rol`,
-    args: [cuenta.id, slug, rol]
-  });
+  await vincularCuentaId(cuenta.id, slug, rol);
   return { ok: true };
 }
 
@@ -95,4 +99,74 @@ export async function desvincularCuenta(cuentaId: string, slug: string): Promise
     sql: "DELETE FROM cuenta_negocio WHERE cuenta_id = ? AND slug = ?",
     args: [cuentaId, slug]
   });
+}
+
+// --- Invitaciones: links de un solo uso para que alguien se registre y
+// quede vinculado solo, sin que el admin tenga que volver a entrar
+// después a vincularlo a mano por email. El token es la única prueba de
+// que quien lo tiene fue invitado por un admin de ESE negocio — por eso
+// tiene que ser impredecible (randomUUID) y de un solo uso, si no
+// cualquiera que consiga el link (o lo reenvíe) podría auto-vincularse
+// de nuevo, o un tercero que lo intercepte podría usarlo antes que el
+// invitado real.
+export type Invitacion = { token: string; slug: string; negocio: string; rol: string; expiraAt: string };
+
+const DIAS_EXPIRACION_INVITACION = 7;
+
+export async function crearInvitacion(slug: string, rol: string, creadoPor: string): Promise<string> {
+  const token = randomUUID();
+  const expiraAt = new Date(Date.now() + DIAS_EXPIRACION_INVITACION * 24 * 3600 * 1000).toISOString();
+  await obtenerDirectorio().execute({
+    sql: "INSERT INTO invitaciones (token, slug, rol, creado_por, expira_at) VALUES (?, ?, ?, ?, ?)",
+    args: [token, slug, rol, creadoPor, expiraAt]
+  });
+  return token;
+}
+
+// Invitaciones pendientes (todavía no usadas ni vencidas) de un negocio —
+// para mostrarlas en Cuentas con opción de revocarlas.
+export async function invitacionesPendientes(slug: string): Promise<Invitacion[]> {
+  const r = await obtenerDirectorio().execute({
+    sql: `SELECT i.token, i.slug, n.negocio, i.rol, i.expira_at
+          FROM invitaciones i JOIN negocios n ON n.slug = i.slug
+          WHERE i.slug = ? AND i.usado_por IS NULL AND i.expira_at > datetime('now')
+          ORDER BY i.creado_at DESC`,
+    args: [slug]
+  });
+  return r.rows.map((f) => ({ token: String(f.token), slug: String(f.slug), negocio: String(f.negocio), rol: String(f.rol), expiraAt: String(f.expira_at) }));
+}
+
+export async function revocarInvitacion(token: string, slug: string): Promise<void> {
+  await obtenerDirectorio().execute({
+    sql: "DELETE FROM invitaciones WHERE token = ? AND slug = ?",
+    args: [token, slug]
+  });
+}
+
+export async function buscarInvitacionValida(token: string): Promise<{ slug: string; negocio: string; rol: string } | null> {
+  const r = await obtenerDirectorio().execute({
+    sql: `SELECT i.slug, n.negocio, i.rol
+          FROM invitaciones i JOIN negocios n ON n.slug = i.slug
+          WHERE i.token = ? AND i.usado_por IS NULL AND i.expira_at > datetime('now')`,
+    args: [token]
+  });
+  const f = r.rows[0];
+  if (!f) return null;
+  return { slug: String(f.slug), negocio: String(f.negocio), rol: String(f.rol) };
+}
+
+// Consume la invitación y vincula de una — el UPDATE con "usado_por IS
+// NULL" en el WHERE es lo que hace que sea de un solo uso incluso si dos
+// pedidos llegan casi al mismo tiempo (el segundo actualiza 0 filas y se
+// entera de que ya se usó).
+export async function usarInvitacion(token: string, cuentaId: string): Promise<{ slug: string; negocio: string; rol: string } | null> {
+  const invitacion = await buscarInvitacionValida(token);
+  if (!invitacion) return null;
+  const r = await obtenerDirectorio().execute({
+    sql: "UPDATE invitaciones SET usado_por = ?, usado_at = datetime('now') WHERE token = ? AND usado_por IS NULL",
+    args: [cuentaId, token]
+  });
+  if (r.rowsAffected === 0) return null;
+  await vincularCuentaId(cuentaId, invitacion.slug, invitacion.rol);
+  return invitacion;
 }

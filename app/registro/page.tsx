@@ -1,9 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
+type Vinculado = { slug: string; negocio: string; rol: string };
+
 export default function RegistroPage() {
+  return (
+    <Suspense>
+      <RegistroForm />
+    </Suspense>
+  );
+}
+
+function RegistroForm() {
+  const invite = useSearchParams().get("invite");
+  const [invitacionInfo, setInvitacionInfo] = useState<{ negocio: string; rol: string } | { error: true } | null>(null);
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
   const [email, setEmail] = useState("");
@@ -11,7 +24,17 @@ export default function RegistroPage() {
   const [confirmarPassword, setConfirmarPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [listo, setListo] = useState(false);
+  const [vinculado, setVinculado] = useState<Vinculado | null>(null);
+  const [avisoInvitacion, setAvisoInvitacion] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
+
+  useEffect(() => {
+    if (!invite) return;
+    fetch(`/api/invitaciones?token=${encodeURIComponent(invite)}`)
+      .then((r) => r.json())
+      .then((datos) => setInvitacionInfo(datos.negocio ? { negocio: datos.negocio, rol: datos.rol } : { error: true }))
+      .catch(() => setInvitacionInfo({ error: true }));
+  }, [invite]);
 
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
@@ -25,13 +48,15 @@ export default function RegistroPage() {
       const res = await fetch("/api/registro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre: `${nombre.trim()} ${apellido.trim()}`.trim(), email, password }),
+        body: JSON.stringify({ nombre: `${nombre.trim()} ${apellido.trim()}`.trim(), email, password, invite }),
       });
       const datos = await res.json();
       if (!res.ok) {
         setError(datos.error ?? "No se pudo crear la cuenta.");
         return;
       }
+      setVinculado(datos.vinculado ?? null);
+      setAvisoInvitacion(datos.avisoInvitacion ?? null);
       setListo(true);
     } catch {
       setError("No se pudo conectar. Revisa tu internet e intenta de nuevo.");
@@ -46,10 +71,18 @@ export default function RegistroPage() {
         <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-kaxa-100 p-6 text-center">
           <div className="w-12 h-12 mx-auto rounded-full bg-kaxa-50 flex items-center justify-center text-2xl mb-3">✅</div>
           <h1 className="text-lg font-semibold mb-2">Cuenta creada</h1>
-          <p className="text-sm text-gray-500 mb-6">
-            Ahora pedile a quien administra el negocio en Kaxa que te vincule desde Cuentas, dentro del panel, con este
-            email: <span className="font-medium">{email}</span>
-          </p>
+          {vinculado ? (
+            <p className="text-sm text-gray-500 mb-6">
+              Ya quedaste vinculado a <span className="font-medium">{vinculado.negocio}</span> como{" "}
+              {vinculado.rol === "ADMIN" ? "administrador" : "cajero"}. Ya podés iniciar sesión.
+            </p>
+          ) : (
+            <p className="text-sm text-gray-500 mb-6">
+              {avisoInvitacion ? `${avisoInvitacion} ` : ""}
+              Pedile a quien administra el negocio en Kaxa que te vincule desde Cuentas, dentro del panel, con este
+              email: <span className="font-medium">{email}</span>
+            </p>
+          )}
           <Link href="/login" className="text-sm text-kaxa-600 font-medium">
             Ir a iniciar sesión →
           </Link>
@@ -67,7 +100,19 @@ export default function RegistroPage() {
           </div>
           <span className="font-semibold text-lg">Kaxa Panel</span>
         </div>
-        <p className="text-sm text-gray-500 mb-6">Creá tu cuenta — después te vinculan al negocio.</p>
+        {invitacionInfo && "negocio" in invitacionInfo ? (
+          <p className="text-sm bg-kaxa-50 text-kaxa-700 rounded-lg px-3 py-2 mb-6">
+            Te invitaron a <span className="font-medium">{invitacionInfo.negocio}</span> como{" "}
+            {invitacionInfo.rol === "ADMIN" ? "administrador" : "cajero"} — al crear tu cuenta quedás vinculado directo.
+          </p>
+        ) : invitacionInfo && "error" in invitacionInfo ? (
+          <p className="text-sm bg-red-50 text-red-600 rounded-lg px-3 py-2 mb-6">
+            Ese link de invitación ya no es válido (vencido o ya usado) — podés registrarte igual, pero te van a tener
+            que vincular a mano después.
+          </p>
+        ) : (
+          <p className="text-sm text-gray-500 mb-6">Creá tu cuenta — después te vinculan al negocio.</p>
+        )}
 
         <label className="block text-sm font-medium mb-1">Nombre</label>
         <input

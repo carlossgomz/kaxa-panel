@@ -1,0 +1,45 @@
+import { NextRequest, NextResponse } from "next/server";
+import { obtenerSesion } from "@/lib/auth";
+import { crearInvitacion, revocarInvitacion, buscarInvitacionValida } from "@/lib/cuentas";
+
+// Sin sesión a propósito — la usa /registro para mostrar "te invitaron a
+// tal negocio" antes de crear la cuenta. No es información sensible (el
+// nombre del negocio ya se ve en el login normal), y solo responde algo
+// para un token válido, no vencido y sin usar.
+export async function GET(req: NextRequest) {
+  const token = req.nextUrl.searchParams.get("token");
+  if (!token) return NextResponse.json({ error: "Falta el token." }, { status: 400 });
+  const invitacion = await buscarInvitacionValida(token);
+  if (!invitacion) return NextResponse.json({ error: "Ese link de invitación ya no es válido." }, { status: 404 });
+  return NextResponse.json(invitacion);
+}
+
+// El slug siempre sale de la sesión firmada de quien pide la invitación
+// (nunca del body) — mismo motivo que en /api/cuentas: si se tomara del
+// body, cualquier ADMIN podría generar invitaciones para un negocio que
+// no es el suyo.
+export async function POST(req: NextRequest) {
+  const sesion = obtenerSesion();
+  if (!sesion) return NextResponse.json({ error: "Sesión inválida." }, { status: 401 });
+  if (sesion.rol !== "ADMIN") return NextResponse.json({ error: "Solo el administrador puede invitar cuentas." }, { status: 403 });
+
+  const { rol } = await req.json();
+  if (!rol || !["ADMIN", "CAJERO"].includes(rol)) {
+    return NextResponse.json({ error: "El rol no es válido." }, { status: 400 });
+  }
+
+  const token = await crearInvitacion(sesion.slug, rol, sesion.usuarioId);
+  return NextResponse.json({ token });
+}
+
+export async function DELETE(req: NextRequest) {
+  const sesion = obtenerSesion();
+  if (!sesion) return NextResponse.json({ error: "Sesión inválida." }, { status: 401 });
+  if (sesion.rol !== "ADMIN") return NextResponse.json({ error: "Solo el administrador puede revocar invitaciones." }, { status: 403 });
+
+  const { token } = await req.json();
+  if (!token) return NextResponse.json({ error: "Falta el token." }, { status: 400 });
+
+  await revocarInvitacion(token, sesion.slug);
+  return NextResponse.json({ ok: true });
+}
