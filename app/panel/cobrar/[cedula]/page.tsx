@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { obtenerContexto } from "@/lib/contexto";
-import NavTabs from "@/components/NavTabs";
 import AbonoForm from "./AbonoForm";
 
 type VentaCredito = {
@@ -13,7 +12,7 @@ type VentaCredito = {
 };
 
 export default async function ClienteCobrarPage({ params }: { params: { cedula: string } }) {
-  const { sesion, db } = await obtenerContexto();
+  const { db } = await obtenerContexto();
   const cedula = decodeURIComponent(params.cedula);
 
   const [config, clienteRes, ventasRes] = await Promise.all([
@@ -47,7 +46,7 @@ export default async function ClienteCobrarPage({ params }: { params: { cedula: 
   })) as VentaCredito[];
 
   return (
-    <main className="min-h-screen px-4 py-8 pb-28 max-w-md mx-auto">
+    <div>
       <Link href="/panel/cobrar" className="text-sm text-kaxa-600 mb-4 inline-block">
         ← Cuentas por cobrar
       </Link>
@@ -77,8 +76,6 @@ export default async function ClienteCobrarPage({ params }: { params: { cedula: 
           </div>
         ))}
       </div>
-
-      <NavTabs rol={sesion.rol} />
-    </main>
+    </div>
   );
 }

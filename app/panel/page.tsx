@@ -1,14 +1,8 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { obtenerSesion } from "@/lib/auth";
-import { buscarNegocio } from "@/lib/directorio";
-import { clienteTurso } from "@/lib/turso";
-import NavTabs from "@/components/NavTabs";
+import { obtenerContexto } from "@/lib/contexto";
 
-async function totalPeriodo(db: ReturnType<typeof clienteTurso>, condicionFecha: string) {
-  const r = await db.execute(
-    `SELECT COALESCE(SUM(total_bs), 0) as total FROM ventas WHERE ${condicionFecha}`
-  );
+async function totalPeriodo(db: Awaited<ReturnType<typeof obtenerContexto>>["db"], condicionFecha: string) {
+  const r = await db.execute(`SELECT COALESCE(SUM(total_bs), 0) as total FROM ventas WHERE ${condicionFecha}`);
   return Number(r.rows[0]?.total ?? 0);
 }
 
@@ -23,13 +17,7 @@ function variacion(actual: number, anterior: number): number | null {
 type ProductoTop = { nombre: string; cantidad: number };
 
 export default async function PanelPage() {
-  const sesion = obtenerSesion();
-  if (!sesion) redirect("/login");
-
-  const negocio = await buscarNegocio(sesion.slug);
-  if (!negocio) redirect("/login");
-
-  const db = clienteTurso(negocio.turso_url, negocio.turso_token);
+  const { negocio, db } = await obtenerContexto();
 
   const [
     config,
@@ -87,36 +75,39 @@ export default async function PanelPage() {
   ];
 
   return (
-    <main className="min-h-screen px-4 py-8 pb-28 max-w-md mx-auto">
-      <div className="flex items-center gap-2 mb-1">
-        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-kaxa-400 to-kaxa-900 flex items-center justify-center text-white font-bold text-sm">
-          K
+    <div>
+      <h1 className="text-xl font-semibold mb-1">Hola 👋</h1>
+      <p className="text-sm text-gray-500 mb-6">Así va {nombreNegocio} ahora mismo.</p>
+
+      <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-3 gap-2">
+          {tarjetas.map((t) => (
+            <div key={t.titulo} className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3">
+              <p className="text-[11px] text-gray-500 leading-tight">{t.titulo}</p>
+              <p className="text-base font-semibold mt-1 leading-tight">Bs {t.bs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</p>
+              <p className="text-[11px] text-kaxa-600 font-medium">${(t.bs / tasa).toFixed(0)}</p>
+              <p className={`text-[10px] mt-1 leading-tight ${t.variacion === null ? "text-gray-400" : t.variacion >= 0 ? "text-green-600" : "text-red-500"}`}>
+                {t.variacion === null ? "—" : `${t.variacion >= 0 ? "▲" : "▼"} ${Math.abs(t.variacion).toFixed(0)}%`}
+              </p>
+            </div>
+          ))}
         </div>
-        <span className="font-semibold">Kaxa · Panel</span>
-      </div>
-      <h1 className="text-xl font-semibold mt-4 mb-6">{nombreNegocio}</h1>
 
-      <div className="flex flex-col gap-3">
-        {tarjetas.map((t) => (
-          <div key={t.titulo} className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5">
-            <p className="text-sm text-gray-500">{t.titulo}</p>
-            <p className="text-2xl font-semibold mt-1">Bs {t.bs.toFixed(2)}</p>
-            <p className="text-sm text-kaxa-600 font-medium">USD {(t.bs / tasa).toFixed(2)}</p>
-            <p className={`text-xs mt-2 ${t.variacion === null ? "text-gray-400" : t.variacion >= 0 ? "text-green-600" : "text-red-500"}`}>
-              {t.variacion === null ? "Sin datos del período anterior" : `${t.variacion >= 0 ? "▲" : "▼"} ${Math.abs(t.variacion).toFixed(0)}% ${t.comparacion}`}
-            </p>
+        <Link
+          href="/panel/cobrar"
+          className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5 block transition-transform active:scale-[0.98]"
+        >
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-gray-500">💵 Cuentas por cobrar</p>
+            <span className="text-kaxa-400 text-sm">→</span>
           </div>
-        ))}
-
-        <Link href="/panel/cobrar" className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5 block">
-          <p className="text-sm text-gray-500">Cuentas por cobrar</p>
           <p className="text-2xl font-semibold mt-1">USD {deudaUsd.toFixed(2)}</p>
           <p className="text-sm text-kaxa-600 font-medium">Bs {(deudaUsd * tasa).toFixed(2)}</p>
-          <p className="text-xs text-gray-400 mt-2">Lo que te deben tus clientes a crédito, a hoy — toca para ver el detalle</p>
+          <p className="text-xs text-gray-400 mt-2">Lo que te deben tus clientes a crédito, a hoy</p>
         </Link>
 
         <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5">
-          <p className="text-sm text-gray-500">Producto más vendido este mes</p>
+          <p className="text-sm text-gray-500">🏆 Producto más vendido este mes</p>
           {top ? (
             <>
               <p className="text-2xl font-semibold mt-1">{top.nombre}</p>
@@ -126,13 +117,31 @@ export default async function PanelPage() {
             <p className="text-sm text-gray-400 mt-1">Todavía no hay ventas este mes</p>
           )}
         </div>
+
+        <div className="grid grid-cols-3 gap-2">
+          <Link
+            href="/panel/facturas"
+            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3 flex flex-col items-center gap-1 text-center transition-transform active:scale-[0.98]"
+          >
+            <span className="text-xl">🧾</span>
+            <span className="text-xs font-medium">Facturas</span>
+          </Link>
+          <Link
+            href="/panel/inventario"
+            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3 flex flex-col items-center gap-1 text-center transition-transform active:scale-[0.98]"
+          >
+            <span className="text-xl">📊</span>
+            <span className="text-xs font-medium">Stock</span>
+          </Link>
+          <Link
+            href="/panel/caja"
+            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3 flex flex-col items-center gap-1 text-center transition-transform active:scale-[0.98]"
+          >
+            <span className="text-xl">🏦</span>
+            <span className="text-xs font-medium">Caja</span>
+          </Link>
+        </div>
       </div>
-
-      <form action="/api/logout" method="post" className="mt-8">
-        <button className="text-sm text-gray-500 underline">cerrar sesión</button>
-      </form>
-
-      <NavTabs rol={sesion.rol} />
-    </main>
+    </div>
   );
 }

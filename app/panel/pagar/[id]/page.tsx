@@ -1,10 +1,9 @@
 import { notFound } from "next/navigation";
 import { exigirAdmin } from "@/lib/contexto";
-import NavTabs from "@/components/NavTabs";
 import PagarProveedorClient from "./PagarProveedorClient";
 
 export default async function ProveedorPagarPage({ params }: { params: { id: string } }) {
-  const { sesion, db } = await exigirAdmin();
+  const { db } = await exigirAdmin();
 
   const [config, proveedorRes, facturasRes] = await Promise.all([
     db.execute("SELECT tasa_cambio_dia FROM config WHERE id = 1"),
@@ -30,10 +29,5 @@ export default async function ProveedorPagarPage({ params }: { params: { id: str
     estado: String(r.estado),
   }));
 
-  return (
-    <main className="min-h-screen px-4 py-8 pb-28 max-w-md mx-auto">
-      <PagarProveedorClient proveedorNombre={String(filaProveedor.nombre)} facturas={facturas} tasaHoy={tasa} />
-      <NavTabs rol={sesion.rol} />
-    </main>
-  );
+  return <PagarProveedorClient proveedorNombre={String(filaProveedor.nombre)} facturas={facturas} tasaHoy={tasa} />;
 }

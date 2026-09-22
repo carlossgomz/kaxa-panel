@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { exigirAdmin } from "@/lib/contexto";
-import NavTabs from "@/components/NavTabs";
 
 type ProveedorDeudor = {
   proveedor_id: string;
@@ -10,7 +9,7 @@ type ProveedorDeudor = {
 };
 
 export default async function PagarPage() {
-  const { sesion, db } = await exigirAdmin();
+  const { db } = await exigirAdmin();
 
   // Misma consulta que CuentasPorPagar en Cuentas.tsx del escritorio.
   const [config, proveedoresRes] = await Promise.all([
@@ -38,7 +37,7 @@ export default async function PagarPage() {
   const totalUsd = proveedores.reduce((acc, p) => acc + p.total_pendiente_usd, 0);
 
   return (
-    <main className="min-h-screen px-4 py-8 pb-28 max-w-md mx-auto">
+    <div>
       <h1 className="text-xl font-semibold mb-1">Cuentas por pagar</h1>
       <p className="text-sm text-gray-500 mb-6">
         Lo que le debes a tus proveedores — el Bs se calcula a la tasa de hoy ({tasa.toFixed(2)} Bs/$).
@@ -58,7 +57,7 @@ export default async function PagarPage() {
           <Link
             key={p.proveedor_id}
             href={`/panel/pagar/${p.proveedor_id}`}
-            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 flex items-center justify-between"
+            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 flex items-center justify-between transition-transform active:scale-[0.98]"
           >
             <div>
               <p className="font-medium">{p.proveedor_nombre}</p>
@@ -73,8 +72,6 @@ export default async function PagarPage() {
           </Link>
         ))}
       </div>
-
-      <NavTabs rol={sesion.rol} />
-    </main>
+    </div>
   );
 }

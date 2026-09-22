@@ -1,7 +1,7 @@
 import { obtenerContexto } from "@/lib/contexto";
 import { normalizarTexto, sqlSinAcentos } from "@/lib/busqueda";
 import { estadoStock, formatearStock, precioVentaBsHoy } from "@/lib/precios";
-import NavTabs from "@/components/NavTabs";
+import InventarioFiltro from "./InventarioFiltro";
 
 const BADGE: Record<string, string> = {
   agotado: "bg-red-50 text-red-700",
@@ -22,7 +22,7 @@ export default async function InventarioPage({
 }: {
   searchParams: { q?: string; problemas?: string };
 }) {
-  const { sesion, db } = await obtenerContexto();
+  const { db } = await obtenerContexto();
 
   const term = (searchParams.q || "").trim();
   const soloProblemas = searchParams.problemas === "1";
@@ -57,25 +57,11 @@ export default async function InventarioPage({
   }
 
   return (
-    <main className="min-h-screen px-4 py-8 pb-28 max-w-md mx-auto">
+    <div>
       <h1 className="text-xl font-semibold mb-1">Inventario</h1>
       <p className="text-sm text-gray-500 mb-4">Stock y precio de venta a la tasa de hoy ({tasa.toFixed(2)} Bs/$).</p>
 
-      <form className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4 flex flex-col gap-2">
-        <input
-          name="q"
-          defaultValue={term}
-          placeholder="Buscar por nombre o código"
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
-        />
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" name="problemas" value="1" defaultChecked={soloProblemas} />
-          Solo crítico (1 unidad) o agotado
-        </label>
-        <button type="submit" className="rounded-lg bg-kaxa-600 text-white font-medium py-2 text-sm">
-          Buscar
-        </button>
-      </form>
+      <InventarioFiltro q={term} problemas={soloProblemas} />
 
       <div className="flex flex-col gap-2">
         {productos.length === 0 && <p className="text-sm text-gray-400 text-center py-8">Nada que coincida.</p>}
@@ -98,8 +84,6 @@ export default async function InventarioPage({
           );
         })}
       </div>
-
-      <NavTabs rol={sesion.rol} />
-    </main>
+    </div>
   );
 }

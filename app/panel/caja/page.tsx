@@ -1,5 +1,5 @@
 import { obtenerContexto } from "@/lib/contexto";
-import NavTabs from "@/components/NavTabs";
+import CajaFecha from "./CajaFecha";
 
 function hoyISO() {
   return new Date(Date.now() - 4 * 3600 * 1000).toISOString().slice(0, 10);
@@ -16,7 +16,7 @@ const METODOS_BASE = ["PUNTO_VENTA", "BIOPAGO", "PAGO_MOVIL", "EFECTIVO", "DIVIS
 // documentado allá), pero acá no se puede contar/guardar el cierre: eso
 // sigue siendo una acción física, en la tienda, con el efectivo en mano.
 export default async function CajaPage({ searchParams }: { searchParams: { fecha?: string } }) {
-  const { sesion, db } = await obtenerContexto();
+  const { db } = await obtenerContexto();
   const fecha = searchParams.fecha || hoyISO();
 
   const [config, porVentaRes, porCobroRes, porAvanceCobroRes, porAvanceEfectivoRes, porAporteRes] = await Promise.all([
@@ -74,18 +74,13 @@ export default async function CajaPage({ searchParams }: { searchParams: { fecha
   const totalBolivares = filas.reduce((a, f) => a + f.esperado, 0);
 
   return (
-    <main className="min-h-screen px-4 py-8 pb-28 max-w-md mx-auto">
+    <div>
       <h1 className="text-xl font-semibold mb-1">Cuadre de caja</h1>
       <p className="text-sm text-gray-500 mb-4">
         Lo esperado en caja, calculado en vivo — el conteo físico se sigue haciendo desde el programa en la tienda.
       </p>
 
-      <form className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4 flex gap-2">
-        <input type="date" name="fecha" defaultValue={fecha} className="flex-1 rounded-lg border border-gray-300 px-2 py-2 text-sm" />
-        <button type="submit" className="rounded-lg bg-kaxa-600 text-white font-medium px-4 text-sm">
-          Ver
-        </button>
-      </form>
+      <CajaFecha fecha={fecha} />
 
       <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5 mb-4">
         <p className="text-sm text-gray-500">Total estimado en bolívares</p>
@@ -113,8 +108,6 @@ export default async function CajaPage({ searchParams }: { searchParams: { fecha
           Efectivo incluye +Bs {aporteCapitalExterno.toFixed(2)} de aportes de capital externo y −Bs {avanceEfectivo.toFixed(2)} entregados en avances.
         </p>
       )}
-
-      <NavTabs rol={sesion.rol} />
-    </main>
+    </div>
   );
 }

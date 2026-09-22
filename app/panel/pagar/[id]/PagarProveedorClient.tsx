@@ -154,7 +154,7 @@ function FilaFactura({ factura, tasaHoy }: { factura: FacturaPendiente; tasaHoy:
           <button
             onClick={confirmar}
             disabled={guardando}
-            className="w-full rounded-lg bg-kaxa-600 text-white font-medium py-2.5 disabled:opacity-60"
+            className="w-full rounded-lg bg-kaxa-600 text-white font-medium py-2.5 transition-transform active:scale-[0.98] disabled:opacity-60"
           >
             {guardando ? "Guardando…" : "Confirmar pago"}
           </button>

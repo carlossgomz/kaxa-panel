@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { obtenerContexto } from "@/lib/contexto";
-import NavTabs from "@/components/NavTabs";
 
 export default async function FacturaDetallePage({ params }: { params: { id: string } }) {
-  const { sesion, db } = await obtenerContexto();
+  const { db } = await obtenerContexto();
 
   const [ventaRes, itemsRes, pagosRes] = await Promise.all([
     db.execute({
@@ -42,7 +41,7 @@ export default async function FacturaDetallePage({ params }: { params: { id: str
   }));
 
   return (
-    <main className="min-h-screen px-4 py-8 pb-28 max-w-md mx-auto">
+    <div>
       <Link href="/panel/facturas" className="text-sm text-kaxa-600 mb-4 inline-block">
         ← Facturas
       </Link>
@@ -103,8 +102,6 @@ export default async function FacturaDetallePage({ params }: { params: { id: str
           </p>
         )}
       </div>
-
-      <NavTabs rol={sesion.rol} />
-    </main>
+    </div>
   );
 }

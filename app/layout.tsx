@@ -2,8 +2,8 @@ import "./globals.css";
 import type { ReactNode } from "react";
 
 export const metadata = {
-  title: "Kaxa — Panel",
-  description: "Ventas de tu negocio, desde cualquier lugar"
+  title: "Kaxa Móvil",
+  description: "Gestiona tu negocio desde cualquier lugar"
 };
 
 export const viewport = {

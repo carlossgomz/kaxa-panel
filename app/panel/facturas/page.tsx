@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { obtenerContexto } from "@/lib/contexto";
 import { normalizarTexto, sqlSinAcentos } from "@/lib/busqueda";
-import NavTabs from "@/components/NavTabs";
+import FacturasFiltro from "./FacturasFiltro";
 
 function hoyISO() {
   // America/Caracas, UTC-4 fijo.
@@ -19,7 +19,7 @@ export default async function FacturasPage({
 }: {
   searchParams: { desde?: string; hasta?: string; q?: string };
 }) {
-  const { sesion, db } = await obtenerContexto();
+  const { db } = await obtenerContexto();
 
   const desde = searchParams.desde || hoyISO();
   const hasta = searchParams.hasta || hoyISO();
@@ -53,25 +53,11 @@ export default async function FacturasPage({
   }));
 
   return (
-    <main className="min-h-screen px-4 py-8 pb-28 max-w-md mx-auto">
+    <div>
       <h1 className="text-xl font-semibold mb-1">Facturas</h1>
       <p className="text-sm text-gray-500 mb-4">Buscar ventas por ticket, cliente o cédula.</p>
 
-      <form className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4 flex flex-col gap-2">
-        <div className="flex gap-2">
-          <input type="date" name="desde" defaultValue={desde} className="flex-1 rounded-lg border border-gray-300 px-2 py-2 text-sm" />
-          <input type="date" name="hasta" defaultValue={hasta} className="flex-1 rounded-lg border border-gray-300 px-2 py-2 text-sm" />
-        </div>
-        <input
-          name="q"
-          defaultValue={termCrudo}
-          placeholder="N° de ticket, cliente o cédula"
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
-        />
-        <button type="submit" className="rounded-lg bg-kaxa-600 text-white font-medium py-2 text-sm">
-          Buscar
-        </button>
-      </form>
+      <FacturasFiltro desde={desde} hasta={hasta} q={termCrudo} />
 
       <div className="flex flex-col gap-2">
         {facturas.length === 0 && <p className="text-sm text-gray-400 text-center py-8">Sin facturas en ese rango/búsqueda.</p>}
@@ -81,7 +67,7 @@ export default async function FacturasPage({
             <Link
               key={f.id}
               href={`/panel/facturas/${f.id}`}
-              className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 flex items-center justify-between"
+              className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 flex items-center justify-between transition-transform active:scale-[0.98]"
             >
               <div>
                 <p className="font-medium">{f.numero_ticket}</p>
@@ -98,8 +84,6 @@ export default async function FacturasPage({
           );
         })}
       </div>
-
-      <NavTabs rol={sesion.rol} />
-    </main>
+    </div>
   );
 }

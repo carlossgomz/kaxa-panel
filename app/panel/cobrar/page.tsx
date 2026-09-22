@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { obtenerContexto } from "@/lib/contexto";
-import NavTabs from "@/components/NavTabs";
 
 type ClienteDeudor = {
   cliente_nombre: string;
@@ -10,7 +9,7 @@ type ClienteDeudor = {
 };
 
 export default async function CobrarPage() {
-  const { sesion, db } = await obtenerContexto();
+  const { db } = await obtenerContexto();
 
   // Misma consulta que CuentasPorCobrar en Cuentas.tsx del escritorio.
   const [config, clientesRes] = await Promise.all([
@@ -37,7 +36,7 @@ export default async function CobrarPage() {
   const totalUsd = clientes.reduce((acc, c) => acc + c.total_pendiente_usd, 0);
 
   return (
-    <main className="min-h-screen px-4 py-8 pb-28 max-w-md mx-auto">
+    <div>
       <h1 className="text-xl font-semibold mb-1">Cuentas por cobrar</h1>
       <p className="text-sm text-gray-500 mb-6">
         Lo que te deben tus clientes a crédito — el Bs se calcula a la tasa de hoy ({tasa.toFixed(2)} Bs/$).
@@ -57,7 +56,7 @@ export default async function CobrarPage() {
           <Link
             key={c.cliente_cedula}
             href={`/panel/cobrar/${encodeURIComponent(c.cliente_cedula)}`}
-            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 flex items-center justify-between"
+            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 flex items-center justify-between transition-transform active:scale-[0.98]"
           >
             <div>
               <p className="font-medium">{c.cliente_nombre}</p>
@@ -72,8 +71,6 @@ export default async function CobrarPage() {
           </Link>
         ))}
       </div>
-
-      <NavTabs rol={sesion.rol} />
-    </main>
+    </div>
   );
 }

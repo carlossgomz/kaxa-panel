@@ -38,12 +38,13 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
       <form onSubmit={enviar} className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-kaxa-100 p-6">
-        <div className="flex items-center gap-2 mb-6">
+        <div className="flex items-center gap-2 mb-1">
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-kaxa-400 to-kaxa-900 flex items-center justify-center text-white font-bold">
             K
           </div>
-          <span className="font-semibold text-lg">Kaxa · Panel</span>
+          <span className="font-semibold text-lg">Kaxa Móvil</span>
         </div>
+        <p className="text-sm text-gray-500 mb-6">Gestiona tu negocio desde cualquier lugar.</p>
 
         <label className="block text-sm font-medium mb-1">Código de negocio</label>
         <input
@@ -77,7 +78,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={cargando}
-          className="w-full rounded-lg bg-kaxa-600 text-white font-medium py-2.5 disabled:opacity-60"
+          className="w-full rounded-lg bg-kaxa-600 text-white font-medium py-2.5 transition-transform active:scale-[0.98] disabled:opacity-60"
         >
           {cargando ? "Entrando…" : "Entrar"}
         </button>
