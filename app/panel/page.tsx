@@ -31,12 +31,18 @@ export default async function PanelPage() {
     productoTop
   ] = await Promise.all([
     db.execute("SELECT tasa_cambio_dia, nombre_negocio FROM config WHERE id = 1"),
-    totalPeriodo(db, "date(fecha_hora) = date('now')"),
-    totalPeriodo(db, "date(fecha_hora) = date('now', '-1 day')"),
-    totalPeriodo(db, "date(fecha_hora) >= date('now', '-6 days')"),
-    totalPeriodo(db, "date(fecha_hora) BETWEEN date('now', '-13 days') AND date('now', '-7 days')"),
-    totalPeriodo(db, "strftime('%Y-%m', fecha_hora) = strftime('%Y-%m', 'now')"),
-    totalPeriodo(db, "strftime('%Y-%m', fecha_hora) = strftime('%Y-%m', 'now', '-1 month')"),
+    // 'now' en SQLite es UTC, no hora de Venezuela (UTC-4) — sin el
+    // "-4 hours" primero, de 8pm a medianoche hora local esto ya piensa
+    // que es el día siguiente (la fecha en UTC ya cambió), así que "Hoy"
+    // da vacío y las ventas de hoy quedan contadas como "ayer". Mismo
+    // ajuste que ya usa ahoraVenezuela() en los API routes, pero acá en
+    // SQL porque el filtro es del lado de la base.
+    totalPeriodo(db, "date(fecha_hora) = date('now', '-4 hours')"),
+    totalPeriodo(db, "date(fecha_hora) = date('now', '-4 hours', '-1 day')"),
+    totalPeriodo(db, "date(fecha_hora) >= date('now', '-4 hours', '-6 days')"),
+    totalPeriodo(db, "date(fecha_hora) BETWEEN date('now', '-4 hours', '-13 days') AND date('now', '-4 hours', '-7 days')"),
+    totalPeriodo(db, "strftime('%Y-%m', fecha_hora) = strftime('%Y-%m', 'now', '-4 hours')"),
+    totalPeriodo(db, "strftime('%Y-%m', fecha_hora) = strftime('%Y-%m', 'now', '-4 hours', '-1 month')"),
     // Mismo criterio que Cuentas.tsx del programa: monto_pendiente_usd ya
     // está en dólares, no hace falta convertirlo.
     db.execute("SELECT COALESCE(SUM(monto_pendiente_usd), 0) as total FROM ventas WHERE estado = 'CREDITO_PENDIENTE'"),
@@ -52,7 +58,7 @@ export default async function PanelPage() {
        FROM venta_items vi
        JOIN ventas v ON v.id = vi.venta_id
        JOIN productos p ON p.id = vi.producto_id
-       WHERE strftime('%Y-%m', v.fecha_hora) = strftime('%Y-%m', 'now')
+       WHERE strftime('%Y-%m', v.fecha_hora) = strftime('%Y-%m', 'now', '-4 hours')
          AND vi.producto_id != 'f195fbac-103d-48fa-a27a-28371fba7745'
        GROUP BY vi.producto_id
        ORDER BY cantidad DESC
