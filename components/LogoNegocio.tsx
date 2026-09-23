@@ -40,7 +40,7 @@ export default function LogoNegocio({ logo, rol, tamano = "w-8 h-8" }: { logo: s
   }
 
   const imagen = logo ? (
-    <img src={logo} alt="Logo del negocio" className={`${tamano} shrink-0 rounded-lg object-cover border border-kaxa-100`} />
+    <img src={logo} alt="Logo del negocio" className={`${tamano} shrink-0 rounded-lg object-contain bg-white border border-kaxa-100 p-0.5`} />
   ) : (
     <div className={`${tamano} shrink-0 rounded-lg bg-gradient-to-br from-kaxa-400 to-kaxa-900 flex items-center justify-center text-white font-bold text-sm`}>
       K
