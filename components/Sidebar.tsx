@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import LogoNegocio from "./LogoNegocio";
 
 // Versión de escritorio de la navegación: un panel fijo a la izquierda,
 // siempre visible, en vez del botón de hamburguesa de Header.tsx (ese es
 // solo para móvil, oculto acá vía md:hidden). Mismo listado de secciones,
 // nomás mostrado como programa de PC en vez de app de celular.
-export default function Sidebar({ negocio, rol }: { negocio: string; rol: string }) {
+export default function Sidebar({ negocio, rol, logo }: { negocio: string; rol: string; logo: string | null }) {
   const pathname = usePathname();
 
   const tabs = [
@@ -24,9 +25,7 @@ export default function Sidebar({ negocio, rol }: { negocio: string; rol: string
   return (
     <aside className="hidden md:flex md:flex-col md:w-60 md:shrink-0 md:h-screen md:sticky md:top-0 bg-white border-r border-kaxa-100">
       <div className="flex items-center gap-2 px-4 py-4 border-b border-kaxa-100">
-        <div className="w-8 h-8 shrink-0 rounded-lg bg-gradient-to-br from-kaxa-400 to-kaxa-900 flex items-center justify-center text-white font-bold text-sm">
-          K
-        </div>
+        <LogoNegocio logo={logo} rol={rol} />
         <div className="min-w-0">
           <p className="font-semibold text-sm leading-tight truncate">{negocio}</p>
           <p className="text-[11px] text-gray-400 leading-tight">Kaxa Panel</p>

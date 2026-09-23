@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import LogoNegocio from "./LogoNegocio";
 
 // Encabezado fijo arriba con un botón de hamburguesa que despliega las
 // secciones en un menú lateral — reemplaza la barra de pestañas horizontal
@@ -10,7 +11,7 @@ import { usePathname } from "next/navigation";
 // queda un poco más de app y un poco menos de "pestañas de navegador".
 // Solo para móvil (md:hidden) — en pantallas de escritorio la navegación
 // vive en Sidebar.tsx, siempre visible a la izquierda.
-export default function Header({ negocio, rol }: { negocio: string; rol: string }) {
+export default function Header({ negocio, rol, logo }: { negocio: string; rol: string; logo: string | null }) {
   const pathname = usePathname();
   const [menuAbierto, setMenuAbierto] = useState(false);
 
@@ -42,9 +43,7 @@ export default function Header({ negocio, rol }: { negocio: string; rol: string 
             >
               <span className="text-xl leading-none">☰</span>
             </button>
-            <div className="w-8 h-8 shrink-0 rounded-lg bg-gradient-to-br from-kaxa-400 to-kaxa-900 flex items-center justify-center text-white font-bold text-sm">
-              K
-            </div>
+            <LogoNegocio logo={logo} rol={rol} />
             <div className="min-w-0">
               <p className="font-semibold text-sm leading-tight truncate">{negocio}</p>
               <p className="text-[11px] text-gray-400 leading-tight">Kaxa Móvil</p>
@@ -71,9 +70,7 @@ export default function Header({ negocio, rol }: { negocio: string; rol: string 
           />
           <nav className="absolute left-0 top-0 bottom-0 w-64 max-w-[80%] bg-white shadow-xl flex flex-col p-3 pt-4 overflow-y-auto">
             <div className="flex items-center gap-2 px-2 mb-3">
-              <div className="w-8 h-8 shrink-0 rounded-lg bg-gradient-to-br from-kaxa-400 to-kaxa-900 flex items-center justify-center text-white font-bold text-sm">
-                K
-              </div>
+              <LogoNegocio logo={logo} rol={rol} />
               <div className="min-w-0">
                 <p className="font-semibold text-sm leading-tight truncate">{negocio}</p>
                 <p className="text-[11px] text-gray-400 leading-tight">Kaxa Móvil</p>
