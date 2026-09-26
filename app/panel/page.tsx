@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { obtenerContexto } from "@/lib/contexto";
 import { obtenerConsejos, type Consejo } from "@/lib/asistente";
+import KaxMascota, { type PoseKax } from "@/components/KaxMascota";
 
 async function totalPeriodo(db: Awaited<ReturnType<typeof obtenerContexto>>["db"], condicionFecha: string) {
   const r = await db.execute(`SELECT COALESCE(SUM(total_bs), 0) as total FROM ventas WHERE ${condicionFecha}`);
@@ -84,6 +85,12 @@ export default async function PanelPage() {
     mesAnteriorBs,
   });
 
+  const poseKax: PoseKax = consejos.some((c) => c.prioridad === "urgente")
+    ? "alerta"
+    : consejos.some((c) => c.prioridad === "positivo")
+      ? "celebrando"
+      : "neutral";
+
   const tarjetas = [
     { titulo: "Hoy", bs: hoyBs, variacion: variacion(hoyBs, ayerBs), comparacion: "vs. ayer" },
     { titulo: "Últimos 7 días", bs: semanaBs, variacion: variacion(semanaBs, semanaAnteriorBs), comparacion: "vs. los 7 días previos" },
@@ -104,7 +111,10 @@ export default async function PanelPage() {
 
       {consejos.length > 0 && (
         <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
-          <h2 className="font-semibold mb-3">🧭 Asistente Kax</h2>
+          <div className="flex items-center gap-2 mb-3">
+            <KaxMascota pose={poseKax} size={40} />
+            <h2 className="font-semibold">Asistente Kax</h2>
+          </div>
           <div className="flex flex-col gap-2.5">
             {consejos.map((c, i) => {
               const contenido = (
