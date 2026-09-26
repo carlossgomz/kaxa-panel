@@ -5,11 +5,42 @@ import type { Client } from "@libsql/client";
 const PRODUCTO_DELIVERY_ID = "f195fbac-103d-48fa-a27a-28371fba7745";
 
 export type Consejo = {
-  prioridad: "urgente" | "atencion" | "positivo";
+  prioridad: "urgente" | "atencion" | "positivo" | "tip";
   icono: string;
   texto: string;
   href?: string;
 };
+
+export type ResumenPeriodos = {
+  hoyBs: number;
+  ayerBs: number;
+  semanaBs: number;
+  semanaAnteriorBs: number;
+  mesBs: number;
+  mesAnteriorBs: number;
+};
+
+// Consejos generales del negocio, sin depender de ningún dato — para que
+// el Asistente Kax siempre tenga algo que decir, incluso un día tranquilo
+// sin alertas ni récords. Rota por día (mismo consejo todo el día, cambia
+// al día siguiente) en vez de ser aleatorio en cada carga de página.
+const TIPS_GENERALES = [
+  "Revisa tu stock una vez por semana — te ahorra sorpresas de última hora.",
+  "Un cliente que vuelve vale más que uno nuevo: trátalo bien y va a volver.",
+  "Los costos cambian rápido — compara precios con tus proveedores de vez en cuando.",
+  "Mientras más métodos de pago aceptes, menos ventas se te van por no tener cómo cobrar.",
+  "Un inventario ordenado hace que cobrar sea más rápido, sobre todo en horas pico.",
+  "Vale la pena destacar tus productos de mayor margen — no todos generan lo mismo.",
+  "Cierra la caja todos los días, aunque sea rápido — evita sustos más adelante.",
+  "Escuchar lo que piden tus clientes es la mejor forma de saber qué traer nuevo.",
+  "Un cliente fiado que paga a tiempo es un cliente que vale la pena cuidar.",
+  "Revisar tus reportes cada semana ayuda a notar cambios antes de que sean un problema.",
+];
+
+function tipDelDia(): string {
+  const diaDelAnio = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86_400_000);
+  return TIPS_GENERALES[diaDelAnio % TIPS_GENERALES.length];
+}
 
 const UMBRAL_DIAS_CREDITO = 15;
 const UMBRAL_DIAS_FACTURA = 15;
@@ -41,9 +72,9 @@ export async function obtenerConsejos(
   db: Client,
   rol: string,
   tasa: number,
-  hoyBs: number,
-  promedioUltimos7Bs: number
+  resumen: ResumenPeriodos
 ): Promise<Consejo[]> {
+  const { hoyBs, ayerBs, semanaBs, semanaAnteriorBs, mesBs, mesAnteriorBs } = resumen;
   const consejos: Consejo[] = [];
   const esAdmin = rol === "ADMIN";
 
@@ -171,18 +202,40 @@ export async function obtenerConsejos(
     }
   }
 
-  // 6. Buena noticia — reusa números que Inicio ya calculó, sin consulta
-  // extra. Solo aparece si hoy va claramente mejor que el promedio
-  // reciente, para que el asistente no sea solo alertas.
-  if (promedioUltimos7Bs > 0 && hoyBs > promedioUltimos7Bs * 1.2) {
-    const mejora = Math.round((hoyBs / promedioUltimos7Bs - 1) * 100);
+  // 6, 7, 8. Buenas noticias — reusan números que Inicio ya calculó, sin
+  // consultas extra. hoy-vs-ayer es literalmente lo que pidió Carlos
+  // ("que se haya vendido más que el día anterior"); semana y mes son la
+  // misma idea a otra escala, para que el asistente celebre algo casi
+  // cualquier día, no solo alertas.
+  if (hoyBs > 0 && ayerBs > 0 && hoyBs > ayerBs * 1.05) {
+    const mejora = Math.round((hoyBs / ayerBs - 1) * 100);
     consejos.push({
       prioridad: "positivo",
-      icono: "🎉",
-      texto: `¡Vas ${mejora}% mejor que tu promedio de los últimos días! Bs ${hoyBs.toLocaleString("es-VE", { maximumFractionDigits: 0 })} hoy.`,
+      icono: "🚀",
+      texto: `¡Hoy vendiste más que ayer! Bs ${hoyBs.toLocaleString("es-VE", { maximumFractionDigits: 0 })} (+${mejora}%) — así se hace.`,
+    });
+  }
+  if (semanaBs > 0 && semanaAnteriorBs > 0 && semanaBs > semanaAnteriorBs * 1.1) {
+    const mejora = Math.round((semanaBs / semanaAnteriorBs - 1) * 100);
+    consejos.push({
+      prioridad: "positivo",
+      icono: "📅",
+      texto: `Esta semana vas ${mejora}% mejor que la anterior — vas por buen camino.`,
+    });
+  }
+  if (mesBs > 0 && mesAnteriorBs > 0 && mesBs > mesAnteriorBs * 1.1) {
+    const mejora = Math.round((mesBs / mesAnteriorBs - 1) * 100);
+    consejos.push({
+      prioridad: "positivo",
+      icono: "🗓️",
+      texto: `Este mes va ${mejora}% mejor que el pasado — sigue así.`,
     });
   }
 
-  const orden = { urgente: 0, atencion: 1, positivo: 2 };
+  // 9. Consejo general del día — siempre presente, para que el asistente
+  // nunca se quede callado en un día sin nada especial que avisar.
+  consejos.push({ prioridad: "tip", icono: "💡", texto: tipDelDia() });
+
+  const orden = { urgente: 0, atencion: 1, positivo: 2, tip: 3 };
   return consejos.sort((a, b) => orden[a.prioridad] - orden[b.prioridad]);
 }

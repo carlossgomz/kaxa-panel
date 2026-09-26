@@ -75,11 +75,14 @@ export default async function PanelPage() {
     ? { nombre: String(filaTop.nombre), cantidad: Number(filaTop.cantidad) }
     : undefined;
 
-  // Promedio de los 6 días antes de hoy (sin contar hoy mismo) — línea de
-  // base para que el Asistente Kax felicite cuando el día viene mejor de
-  // lo normal, sin que hoy se diluya en su propio promedio.
-  const promedioUltimos7Bs = (semanaBs - hoyBs) / 6;
-  const consejos: Consejo[] = await obtenerConsejos(db, sesion.rol, tasa, hoyBs, promedioUltimos7Bs);
+  const consejos: Consejo[] = await obtenerConsejos(db, sesion.rol, tasa, {
+    hoyBs,
+    ayerBs,
+    semanaBs,
+    semanaAnteriorBs,
+    mesBs,
+    mesAnteriorBs,
+  });
 
   const tarjetas = [
     { titulo: "Hoy", bs: hoyBs, variacion: variacion(hoyBs, ayerBs), comparacion: "vs. ayer" },
@@ -111,7 +114,9 @@ export default async function PanelPage() {
                       ? "bg-red-50 dark:bg-red-950/30"
                       : c.prioridad === "atencion"
                         ? "bg-amber-50 dark:bg-amber-950/20"
-                        : "bg-kaxa-50 dark:bg-kaxa-900/30"
+                        : c.prioridad === "positivo"
+                          ? "bg-kaxa-50 dark:bg-kaxa-900/30"
+                          : "bg-gray-50 dark:bg-[#0d1210]"
                   }`}
                 >
                   <span className="text-base leading-none shrink-0">{c.icono}</span>
