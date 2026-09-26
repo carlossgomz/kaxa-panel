@@ -6,10 +6,12 @@ import { METODOS_PAGO, monedaDeMetodo, EPS } from "@/lib/dinero";
 
 export default function AbonoForm({
   clienteCedula,
+  clienteNombre,
   totalPendienteUsd,
   tasaHoy,
 }: {
   clienteCedula: string;
+  clienteNombre: string;
   totalPendienteUsd: number;
   tasaHoy: number;
 }) {
@@ -19,6 +21,7 @@ export default function AbonoForm({
   const [metodo, setMetodo] = useState<string>("EFECTIVO");
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [guardando, setGuardando] = useState(false);
+  const [exito, setExito] = useState(false);
 
   const monedaMetodo = monedaDeMetodo(metodo);
   const montoNum = Number(monto || "0");
@@ -41,6 +44,12 @@ export default function AbonoForm({
       );
       return;
     }
+
+    const montoTexto = monedaMetodo === "USD" ? `$${montoNum.toFixed(2)}` : `Bs ${montoNum.toFixed(2)}`;
+    if (!window.confirm(`¿Registrar el abono de ${montoTexto} a ${clienteNombre}?`)) {
+      return;
+    }
+
     setGuardando(true);
     try {
       const res = await fetch("/api/abono", {
@@ -59,12 +68,35 @@ export default function AbonoForm({
         return;
       }
       setMonto("");
-      router.refresh();
+      // No usamos router.refresh(): si este abono saldó toda la deuda del
+      // cliente, la consulta de esta misma página ya no lo encuentra entre
+      // los que tienen CREDITO_PENDIENTE y dispara notFound() (error 404) -
+      // el pago quedaba guardado bien, pero sin ninguna confirmación
+      // visible. En vez de eso, mostramos el éxito acá mismo y volvemos a
+      // la lista general (que ya no depende de que este cliente en
+      // particular siga teniendo deuda).
+      setExito(true);
+      setTimeout(() => {
+        router.push("/panel/cobrar");
+        router.refresh();
+      }, 1400);
     } catch {
       setMensaje("No se pudo conectar. Revisa tu internet e intenta de nuevo.");
     } finally {
       setGuardando(false);
     }
+  }
+
+  if (exito) {
+    return (
+      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5 text-center">
+        <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600 text-2xl">
+          ✓
+        </div>
+        <h2 className="font-semibold mb-1">Abono registrado con éxito</h2>
+        <p className="text-sm text-gray-500">Volviendo a la lista de cuentas por cobrar…</p>
+      </div>
+    );
   }
 
   return (

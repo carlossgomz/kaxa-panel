@@ -59,7 +59,12 @@ export default async function ClienteCobrarPage({ params }: { params: { cedula: 
         <p className="text-sm text-kaxa-600 font-medium">Bs {(totalPendienteUsd * tasa).toFixed(2)}</p>
       </div>
 
-      <AbonoForm clienteCedula={cedula} totalPendienteUsd={totalPendienteUsd} tasaHoy={tasa} />
+      <AbonoForm
+        clienteCedula={cedula}
+        clienteNombre={nombreCliente}
+        totalPendienteUsd={totalPendienteUsd}
+        tasaHoy={tasa}
+      />
 
       <h2 className="font-semibold mt-6 mb-2">Ventas pendientes</h2>
       <div className="flex flex-col gap-2">
