@@ -28,8 +28,11 @@ export default function Header({ negocio, rol, logo }: { negocio: string; rol: s
     ...(rol === "ADMIN" ? [{ href: "/panel/compras", label: "Compras", icono: "📥" }] : []),
     ...(rol === "ADMIN" ? [{ href: "/panel/reportes", label: "Reportes", icono: "📈" }] : []),
     { href: "/panel/facturas", label: "Facturas", icono: "🧾" },
+    ...(rol === "ADMIN" ? [{ href: "/panel/movimientos", label: "Movimientos", icono: "🔄" }] : []),
     { href: "/panel/inventario", label: "Stock", icono: "📊" },
     { href: "/panel/caja", label: "Caja", icono: "🏦" },
+    { href: "/panel/clientes", label: "Clientes", icono: "🧑‍🤝‍🧑" },
+    ...(rol === "ADMIN" ? [{ href: "/panel/proveedores", label: "Proveedores", icono: "🚚" }] : []),
     ...(rol === "ADMIN" ? [{ href: "/panel/cuentas", label: "Cuentas", icono: "👥" }] : []),
   ];
 
