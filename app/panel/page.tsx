@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { obtenerContexto } from "@/lib/contexto";
+import { obtenerConsejos, type Consejo } from "@/lib/asistente";
 
 async function totalPeriodo(db: Awaited<ReturnType<typeof obtenerContexto>>["db"], condicionFecha: string) {
   const r = await db.execute(`SELECT COALESCE(SUM(total_bs), 0) as total FROM ventas WHERE ${condicionFecha}`);
@@ -17,7 +18,7 @@ function variacion(actual: number, anterior: number): number | null {
 type ProductoTop = { nombre: string; cantidad: number };
 
 export default async function PanelPage() {
-  const { negocio, db } = await obtenerContexto();
+  const { sesion, negocio, db } = await obtenerContexto();
 
   const [
     config,
@@ -74,6 +75,12 @@ export default async function PanelPage() {
     ? { nombre: String(filaTop.nombre), cantidad: Number(filaTop.cantidad) }
     : undefined;
 
+  // Promedio de los 6 días antes de hoy (sin contar hoy mismo) — línea de
+  // base para que el Asistente Kax felicite cuando el día viene mejor de
+  // lo normal, sin que hoy se diluya en su propio promedio.
+  const promedioUltimos7Bs = (semanaBs - hoyBs) / 6;
+  const consejos: Consejo[] = await obtenerConsejos(db, sesion.rol, tasa, hoyBs, promedioUltimos7Bs);
+
   const tarjetas = [
     { titulo: "Hoy", bs: hoyBs, variacion: variacion(hoyBs, ayerBs), comparacion: "vs. ayer" },
     { titulo: "Últimos 7 días", bs: semanaBs, variacion: variacion(semanaBs, semanaAnteriorBs), comparacion: "vs. los 7 días previos" },
@@ -91,6 +98,37 @@ export default async function PanelPage() {
       >
         🛒 Nueva venta
       </Link>
+
+      {consejos.length > 0 && (
+        <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
+          <h2 className="font-semibold mb-3">🧭 Asistente Kax</h2>
+          <div className="flex flex-col gap-2.5">
+            {consejos.map((c, i) => {
+              const contenido = (
+                <div
+                  className={`flex items-start gap-2.5 rounded-xl p-3 text-sm ${
+                    c.prioridad === "urgente"
+                      ? "bg-red-50 dark:bg-red-950/30"
+                      : c.prioridad === "atencion"
+                        ? "bg-amber-50 dark:bg-amber-950/20"
+                        : "bg-kaxa-50 dark:bg-kaxa-900/30"
+                  }`}
+                >
+                  <span className="text-base leading-none shrink-0">{c.icono}</span>
+                  <span className="text-gray-700 dark:text-gray-200">{c.texto}</span>
+                </div>
+              );
+              return c.href ? (
+                <Link key={i} href={c.href} className="transition-transform active:scale-[0.98]">
+                  {contenido}
+                </Link>
+              ) : (
+                <div key={i}>{contenido}</div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-3 md:gap-4">
         <div className="grid grid-cols-3 gap-2 md:gap-4">
