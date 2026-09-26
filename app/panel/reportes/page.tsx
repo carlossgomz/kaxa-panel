@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { exigirAdmin } from "@/lib/contexto";
 import ReportesFiltro from "./ReportesFiltro";
+import { obtenerConclusionesReporte } from "@/lib/asistente";
+import KaxMascota, { type PoseKax } from "@/components/KaxMascota";
 
 // Mismo producto "placeholder" del recargo de delivery que ya excluyen
 // Estadisticas.tsx y /panel (Inicio) del escritorio - no es un producto
@@ -185,6 +187,22 @@ export default async function ReportesPage({ searchParams }: { searchParams: { d
   const maxGananciaProducto = Math.max(1, ...productosGanancia.map((p) => p.ganancia_bs));
   const maxGastadoCliente = Math.max(1, ...clientesFrecuentes.map((c) => c.total_gastado_bs));
 
+  const conclusiones = obtenerConclusionesReporte({
+    totalBs,
+    gananciaBs,
+    numVentas,
+    metodos,
+    productosTop,
+    categorias,
+    clientesFrecuentes,
+    horaPicoTop,
+  });
+  const poseKax: PoseKax = conclusiones.some((c) => c.prioridad === "atencion")
+    ? "alerta"
+    : conclusiones.some((c) => c.prioridad === "positivo")
+      ? "celebrando"
+      : "neutral";
+
   const hoy = hoyISO();
   const rangos = [
     { label: "Hoy", desde: hoy, hasta: hoy },
@@ -209,6 +227,34 @@ export default async function ReportesPage({ searchParams }: { searchParams: { d
       </div>
 
       <ReportesFiltro desde={desde} hasta={hasta} />
+
+      {conclusiones.length > 0 && (
+        <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
+          <div className="flex items-center gap-2 mb-3">
+            <KaxMascota pose={poseKax} size={40} />
+            <h2 className="font-semibold">Asistente Kax</h2>
+          </div>
+          <div className="flex flex-col gap-2.5">
+            {conclusiones.map((c, i) => (
+              <div
+                key={i}
+                className={`flex items-start gap-2.5 rounded-xl p-3 text-sm ${
+                  c.prioridad === "urgente"
+                    ? "bg-red-50 dark:bg-red-950/30"
+                    : c.prioridad === "atencion"
+                      ? "bg-amber-50 dark:bg-amber-950/20"
+                      : c.prioridad === "positivo"
+                        ? "bg-kaxa-50 dark:bg-kaxa-900/30"
+                        : "bg-gray-50 dark:bg-[#0d1210]"
+                }`}
+              >
+                <span className="text-base leading-none shrink-0">{c.icono}</span>
+                <span className="text-gray-700 dark:text-gray-200">{c.texto}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
