@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { EPS, METODOS_PAGO, monedaDeMetodo } from "@/lib/dinero";
+import { EPS } from "@/lib/dinero";
+import { useMetodosPagoActivos } from "@/lib/useMetodosPago";
 
 type ProductoResultado = { id: string; codigo_barra: string; nombre: string; stock_actual: number; precio_unit_bs: number };
 type LineaCarrito = { producto_id: string; codigo_barra: string; nombre: string; cantidad: number; precio_unit_bs: number; stock_actual: number };
@@ -41,6 +42,8 @@ export default function VentaClient({
   // por negocio — en 0 para todos menos Day Express.
   const [esDelivery, setEsDelivery] = useState(false);
   const [repartidorId, setRepartidorId] = useState<string | null>(null);
+
+  const { metodos: metodosPago, monedaDeMetodo } = useMetodosPagoActivos();
 
   // --- Búsqueda y carrito ---
   const [busqueda, setBusqueda] = useState("");
@@ -447,13 +450,13 @@ export default function VentaClient({
           <>
             <p className="text-xs text-gray-400 mt-2 mb-2">Cobrar completo con:</p>
             <div className="flex flex-wrap gap-2 mb-2">
-              {METODOS_PAGO.map((m) => (
+              {metodosPago.map((m) => (
                 <button
-                  key={m}
-                  onClick={() => cobrarCompletoCon(m)}
+                  key={m.nombre}
+                  onClick={() => cobrarCompletoCon(m.nombre)}
                   className="rounded-full bg-kaxa-50 dark:bg-kaxa-900/30 text-kaxa-700 text-xs font-medium px-3 py-1.5 active:bg-kaxa-100"
                 >
-                  {m.split("_").join(" ")}
+                  {m.nombre.split("_").join(" ")}
                 </button>
               ))}
             </div>
@@ -467,9 +470,9 @@ export default function VentaClient({
         {mostrarDividir && (
           <div className="mt-3 pt-3 border-t border-kaxa-100 dark:border-[#2a332e] flex flex-col gap-2">
             <select value={metodoNuevo} onChange={(e) => setMetodoNuevo(e.target.value)} className="rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2 text-sm">
-              {METODOS_PAGO.map((m) => (
-                <option key={m} value={m}>
-                  {m.split("_").join(" ")}
+              {metodosPago.map((m) => (
+                <option key={m.nombre} value={m.nombre}>
+                  {m.nombre.split("_").join(" ")}
                 </option>
               ))}
             </select>

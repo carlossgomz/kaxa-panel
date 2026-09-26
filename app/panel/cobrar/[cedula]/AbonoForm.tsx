@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { METODOS_PAGO, monedaDeMetodo, EPS } from "@/lib/dinero";
+import { EPS } from "@/lib/dinero";
+import { useMetodosPagoActivos } from "@/lib/useMetodosPago";
 
 export default function AbonoForm({
   clienteCedula,
@@ -22,6 +23,7 @@ export default function AbonoForm({
   const [mensaje, setMensaje] = useState<string | null>(null);
   const [guardando, setGuardando] = useState(false);
   const [exito, setExito] = useState(false);
+  const { metodos: metodosPago, monedaDeMetodo } = useMetodosPagoActivos();
 
   const monedaMetodo = monedaDeMetodo(metodo);
   const montoNum = Number(monto || "0");
@@ -112,9 +114,9 @@ export default function AbonoForm({
         value={metodo}
         onChange={(e) => setMetodo(e.target.value)}
       >
-        {METODOS_PAGO.map((m) => (
-          <option key={m} value={m}>
-            {m.split("_").join(" ")}
+        {metodosPago.map((m) => (
+          <option key={m.nombre} value={m.nombre}>
+            {m.nombre.split("_").join(" ")}
           </option>
         ))}
       </select>

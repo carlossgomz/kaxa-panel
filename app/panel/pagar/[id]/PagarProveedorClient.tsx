@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { METODOS_PAGO, monedaDeMetodo, EPS } from "@/lib/dinero";
+import { EPS } from "@/lib/dinero";
+import { useMetodosPagoActivos, type MetodoPago } from "@/lib/useMetodosPago";
 
 type FacturaPendiente = {
   id: string;
@@ -29,10 +30,14 @@ function FilaFactura({
   factura,
   proveedorNombre,
   tasaHoy,
+  metodosPago,
+  monedaDeMetodo,
 }: {
   factura: FacturaPendiente;
   proveedorNombre: string;
   tasaHoy: number;
+  metodosPago: MetodoPago[];
+  monedaDeMetodo: (nombre: string) => "BS" | "USD";
 }) {
   const router = useRouter();
   const [abierta, setAbierta] = useState(false);
@@ -140,9 +145,9 @@ function FilaFactura({
             value={metodo}
             onChange={(e) => setMetodo(e.target.value)}
           >
-            {METODOS_PAGO.map((m) => (
-              <option key={m} value={m}>
-                {m.split("_").join(" ")}
+            {metodosPago.map((m) => (
+              <option key={m.nombre} value={m.nombre}>
+                {m.nombre.split("_").join(" ")}
               </option>
             ))}
           </select>
@@ -205,6 +210,7 @@ export default function PagarProveedorClient({
   tasaHoy: number;
 }) {
   const totalUsd = facturas.reduce((acc, f) => acc + (f.monto_total_usd - f.monto_pagado_usd), 0);
+  const { metodos: metodosPago, monedaDeMetodo } = useMetodosPagoActivos();
 
   return (
     <>
@@ -216,7 +222,14 @@ export default function PagarProveedorClient({
 
       <div className="flex flex-col gap-2">
         {facturas.map((f) => (
-          <FilaFactura key={f.id} factura={f} proveedorNombre={proveedorNombre} tasaHoy={tasaHoy} />
+          <FilaFactura
+            key={f.id}
+            factura={f}
+            proveedorNombre={proveedorNombre}
+            tasaHoy={tasaHoy}
+            metodosPago={metodosPago}
+            monedaDeMetodo={monedaDeMetodo}
+          />
         ))}
       </div>
     </>
