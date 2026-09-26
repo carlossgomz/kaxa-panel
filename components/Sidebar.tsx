@@ -32,7 +32,7 @@ export default function Sidebar({ negocio, rol, logo }: { negocio: string; rol: 
   return (
     <aside className="hidden md:flex md:flex-col md:w-60 md:shrink-0 md:h-screen md:sticky md:top-0 bg-white border-r border-kaxa-100">
       <div className="flex items-center gap-2 px-4 py-4 border-b border-kaxa-100">
-        <LogoNegocio logo={logo} rol={rol} />
+        <LogoNegocio logo={logo} />
         <div className="min-w-0">
           <p className="font-semibold text-sm leading-tight truncate">{negocio}</p>
           <p className="text-[11px] text-gray-400 leading-tight">Kaxa Panel</p>

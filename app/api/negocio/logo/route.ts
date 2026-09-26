@@ -30,3 +30,16 @@ export async function POST(req: NextRequest) {
   await db.execute({ sql: "UPDATE config SET logo_base64 = ? WHERE id = 1", args: [logo_base64] });
   return NextResponse.json({ ok: true });
 }
+
+export async function DELETE() {
+  const sesion = obtenerSesion();
+  if (!sesion) return NextResponse.json({ error: "Sesión inválida." }, { status: 401 });
+  if (sesion.rol !== "ADMIN") return NextResponse.json({ error: "Solo el administrador puede cambiar el logo." }, { status: 403 });
+
+  const negocio = await buscarNegocio(sesion.slug);
+  if (!negocio) return NextResponse.json({ error: "Sesión inválida." }, { status: 401 });
+
+  const db = clienteTurso(negocio.turso_url, negocio.turso_token);
+  await db.execute({ sql: "UPDATE config SET logo_base64 = NULL WHERE id = 1", args: [] });
+  return NextResponse.json({ ok: true });
+}

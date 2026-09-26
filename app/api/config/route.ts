@@ -5,8 +5,9 @@ import { clienteTurso } from "@/lib/turso";
 
 // Configuración del negocio - solo admin, igual que la categoría
 // "Negocio" en Configuracion.tsx del escritorio (nombre, tasa del día,
-// secciones ocultas). Métodos de pago, Usuarios y Tema quedan afuera de
-// esta primera versión para Kaxa Móvil.
+// secciones ocultas, y ahora también RIF/dirección/teléfono). Métodos de
+// pago, Usuarios y Tema quedan afuera de esta primera versión para Kaxa
+// Móvil.
 export async function PATCH(req: NextRequest) {
   const sesion = obtenerSesion();
   if (!sesion || sesion.rol !== "ADMIN") return NextResponse.json({ error: "No autorizado." }, { status: 403 });
@@ -17,7 +18,7 @@ export async function PATCH(req: NextRequest) {
   const db = clienteTurso(negocio.turso_url, negocio.turso_token);
 
   const campos: string[] = [];
-  const valores: (string | number)[] = [];
+  const valores: (string | number | null)[] = [];
 
   if (typeof body.nombre_negocio === "string" && body.nombre_negocio.trim()) {
     campos.push("nombre_negocio = ?");
@@ -30,6 +31,18 @@ export async function PATCH(req: NextRequest) {
   if (Array.isArray(body.secciones_ocultas)) {
     campos.push("secciones_ocultas = ?");
     valores.push(JSON.stringify(body.secciones_ocultas));
+  }
+  if (typeof body.rif_negocio === "string") {
+    campos.push("rif_negocio = ?");
+    valores.push(body.rif_negocio.trim() || null);
+  }
+  if (typeof body.direccion_negocio === "string") {
+    campos.push("direccion_negocio = ?");
+    valores.push(body.direccion_negocio.trim() || null);
+  }
+  if (typeof body.telefono_negocio === "string") {
+    campos.push("telefono_negocio = ?");
+    valores.push(body.telefono_negocio.trim() || null);
   }
 
   if (campos.length === 0) return NextResponse.json({ error: "Nada para guardar." }, { status: 400 });

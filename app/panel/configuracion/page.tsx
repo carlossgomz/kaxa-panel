@@ -12,8 +12,10 @@ const SECCIONES_PERSONALIZABLES = [
 ];
 
 export default async function ConfiguracionPage() {
-  const { db } = await exigirAdmin();
-  const res = await db.execute("SELECT nombre_negocio, tasa_cambio_dia, secciones_ocultas FROM config WHERE id = 1");
+  const { db, negocio } = await exigirAdmin();
+  const res = await db.execute(
+    "SELECT nombre_negocio, tasa_cambio_dia, secciones_ocultas, logo_base64, rif_negocio, direccion_negocio, telefono_negocio FROM config WHERE id = 1"
+  );
   const fila = res.rows[0];
 
   let ocultas: string[] = [];
@@ -29,6 +31,11 @@ export default async function ConfiguracionPage() {
       tasaHoy={Number(fila?.tasa_cambio_dia ?? 1)}
       seccionesOcultas={ocultas}
       seccionesPersonalizables={SECCIONES_PERSONALIZABLES}
+      logo={fila?.logo_base64 ? String(fila.logo_base64) : null}
+      rifNegocio={fila?.rif_negocio ? String(fila.rif_negocio) : ""}
+      direccionNegocio={fila?.direccion_negocio ? String(fila.direccion_negocio) : ""}
+      telefonoNegocio={fila?.telefono_negocio ? String(fila.telefono_negocio) : ""}
+      plan={negocio.edicion}
     />
   );
 }

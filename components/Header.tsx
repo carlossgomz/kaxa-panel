@@ -50,7 +50,7 @@ export default function Header({ negocio, rol, logo }: { negocio: string; rol: s
             >
               <span className="text-xl leading-none">☰</span>
             </button>
-            <LogoNegocio logo={logo} rol={rol} />
+            <LogoNegocio logo={logo} />
             <div className="min-w-0">
               <p className="font-semibold text-sm leading-tight truncate">{negocio}</p>
               <p className="text-[11px] text-gray-400 leading-tight">Kaxa Móvil</p>
@@ -77,7 +77,7 @@ export default function Header({ negocio, rol, logo }: { negocio: string; rol: s
           />
           <nav className="absolute left-0 top-0 bottom-0 w-64 max-w-[80%] bg-white shadow-xl flex flex-col p-3 pt-4 overflow-y-auto">
             <div className="flex items-center gap-2 px-2 mb-3">
-              <LogoNegocio logo={logo} rol={rol} />
+              <LogoNegocio logo={logo} />
               <div className="min-w-0">
                 <p className="font-semibold text-sm leading-tight truncate">{negocio}</p>
                 <p className="text-[11px] text-gray-400 leading-tight">Kaxa Móvil</p>
