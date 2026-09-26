@@ -46,15 +46,15 @@ export default async function FacturaDetallePage({ params }: { params: { id: str
         ← Facturas
       </Link>
       <h1 className="text-xl font-semibold mb-1">{String(venta.numero_ticket)}</h1>
-      <p className="text-sm text-gray-500 mb-1">
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
         {new Date(String(venta.fecha_hora).replace(" ", "T")).toLocaleString("es-VE")}
       </p>
-      <p className="text-sm text-gray-500 mb-1">Vendedor: {venta.vendedor_nombre ? String(venta.vendedor_nombre) : "sin especificar"}</p>
-      <p className="text-sm text-gray-500 mb-6">
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Vendedor: {venta.vendedor_nombre ? String(venta.vendedor_nombre) : "sin especificar"}</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
         Cliente: {venta.cliente_nombre ? `${venta.cliente_nombre} (${venta.cliente_cedula})` : "Consumidor final"}
       </p>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
         <h2 className="font-semibold mb-2 text-sm">Productos</h2>
         <div className="flex flex-col gap-2">
           {items.map((it, i) => (
@@ -66,12 +66,12 @@ export default async function FacturaDetallePage({ params }: { params: { id: str
             </div>
           ))}
         </div>
-        <div className="border-t border-kaxa-100 mt-3 pt-3 flex flex-col gap-1 text-sm">
-          <div className="flex justify-between text-gray-500">
+        <div className="border-t border-kaxa-100 dark:border-[#2a332e] mt-3 pt-3 flex flex-col gap-1 text-sm">
+          <div className="flex justify-between text-gray-500 dark:text-gray-400">
             <span>Subtotal</span>
             <span>Bs {Number(venta.subtotal_bs).toFixed(2)}</span>
           </div>
-          <div className="flex justify-between text-gray-500">
+          <div className="flex justify-between text-gray-500 dark:text-gray-400">
             <span>IVA</span>
             <span>Bs {Number(venta.iva_bs).toFixed(2)}</span>
           </div>
@@ -82,7 +82,7 @@ export default async function FacturaDetallePage({ params }: { params: { id: str
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
         <h2 className="font-semibold mb-2 text-sm">Pagos</h2>
         <div className="flex flex-col gap-2">
           {pagos.map((p, i) => (
@@ -97,7 +97,7 @@ export default async function FacturaDetallePage({ params }: { params: { id: str
           {pagos.length === 0 && <p className="text-sm text-gray-400">Sin pagos registrados.</p>}
         </div>
         {venta.monto_pendiente_usd != null && Number(venta.monto_pendiente_usd) > 0 && (
-          <p className="text-sm text-red-600 font-medium mt-3">
+          <p className="text-sm text-red-600 dark:text-red-400 font-medium mt-3">
             Saldo pendiente: USD {Number(venta.monto_pendiente_usd).toFixed(2)}
           </p>
         )}

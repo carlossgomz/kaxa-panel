@@ -123,14 +123,14 @@ export default async function ReportesPage({ searchParams }: { searchParams: { d
   return (
     <div>
       <h1 className="text-xl font-semibold mb-1">Reportes</h1>
-      <p className="text-sm text-gray-500 mb-4">Cómo le fue a tu negocio en el período elegido.</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Cómo le fue a tu negocio en el período elegido.</p>
 
       <div className="flex gap-2 mb-3">
         {rangos.map((r) => (
           <Link
             key={r.label}
             href={`/panel/reportes?desde=${r.desde}&hasta=${r.hasta}`}
-            className="text-sm px-3 py-1.5 rounded-full border border-kaxa-100 bg-white text-kaxa-700 font-medium active:bg-kaxa-50"
+            className="text-sm px-3 py-1.5 rounded-full border border-kaxa-100 dark:border-[#2a332e] bg-white dark:bg-[#141b18] text-kaxa-700 font-medium active:bg-kaxa-50 dark:active:bg-kaxa-900/30"
           >
             {r.label}
           </Link>
@@ -140,72 +140,72 @@ export default async function ReportesPage({ searchParams }: { searchParams: { d
       <ReportesFiltro desde={desde} hasta={hasta} />
 
       <div className="grid grid-cols-2 gap-3 mb-4">
-        <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
-          <p className="text-xs text-gray-500">Total vendido</p>
+        <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
+          <p className="text-xs text-gray-500 dark:text-gray-400">Total vendido</p>
           <p className="text-lg font-semibold mt-1">Bs {totalBs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</p>
           <p className="text-sm text-kaxa-600 font-medium">${(totalBs / tasa).toFixed(2)}</p>
         </div>
-        <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
-          <p className="text-xs text-gray-500">Ganancia estimada</p>
+        <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
+          <p className="text-xs text-gray-500 dark:text-gray-400">Ganancia estimada</p>
           <p className="text-lg font-semibold mt-1">Bs {gananciaBs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</p>
           <p className="text-sm text-kaxa-600 font-medium">${(gananciaBs / tasa).toFixed(2)}</p>
         </div>
-        <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
-          <p className="text-xs text-gray-500">N.º de ventas</p>
+        <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
+          <p className="text-xs text-gray-500 dark:text-gray-400">N.º de ventas</p>
           <p className="text-lg font-semibold mt-1">{numVentas}</p>
         </div>
-        <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
-          <p className="text-xs text-gray-500">Ticket promedio</p>
+        <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
+          <p className="text-xs text-gray-500 dark:text-gray-400">Ticket promedio</p>
           <p className="text-lg font-semibold mt-1">Bs {ticketPromedioBs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
         <h2 className="font-semibold mb-2">Ventas por método de pago</h2>
         {metodos.length === 0 && <p className="text-sm text-gray-400 py-2">Sin ventas en este período.</p>}
         <div className="flex flex-col gap-1.5">
           {metodos.map((m) => (
             <div key={m.metodo} className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">{m.metodo.split("_").join(" ")}</span>
+              <span className="text-gray-600 dark:text-gray-300">{m.metodo.split("_").join(" ")}</span>
               <span className="font-medium">Bs {m.monto_bs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
         <h2 className="font-semibold mb-2">Productos más vendidos</h2>
         {productosTop.length === 0 && <p className="text-sm text-gray-400 py-2">Sin ventas en este período.</p>}
         <div className="flex flex-col gap-1.5">
           {productosTop.map((p, i) => (
             <div key={i} className="flex items-center justify-between text-sm">
-              <span className="text-gray-600 truncate pr-2">{p.nombre}</span>
+              <span className="text-gray-600 dark:text-gray-300 truncate pr-2">{p.nombre}</span>
               <span className="font-medium shrink-0">{p.cantidad} vendidos</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
         <h2 className="font-semibold mb-2">Productos que más ganancia generan</h2>
         {productosGanancia.length === 0 && <p className="text-sm text-gray-400 py-2">Sin ventas en este período.</p>}
         <div className="flex flex-col gap-1.5">
           {productosGanancia.map((p, i) => (
             <div key={i} className="flex items-center justify-between text-sm">
-              <span className="text-gray-600 truncate pr-2">{p.nombre}</span>
+              <span className="text-gray-600 dark:text-gray-300 truncate pr-2">{p.nombre}</span>
               <span className="font-medium shrink-0">Bs {p.ganancia_bs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
         <h2 className="font-semibold mb-2">Clientes frecuentes</h2>
         {clientesFrecuentes.length === 0 && <p className="text-sm text-gray-400 py-2">Sin compras de clientes identificados en este período.</p>}
         <div className="flex flex-col gap-1.5">
           {clientesFrecuentes.map((c, i) => (
             <div key={i} className="flex items-center justify-between text-sm">
-              <span className="text-gray-600 truncate pr-2">
+              <span className="text-gray-600 dark:text-gray-300 truncate pr-2">
                 {c.nombre} <span className="text-xs text-gray-400">({c.num_compras} compras)</span>
               </span>
               <span className="font-medium shrink-0">Bs {c.total_gastado_bs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</span>
@@ -214,26 +214,26 @@ export default async function ReportesPage({ searchParams }: { searchParams: { d
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
         <h2 className="font-semibold mb-2">Categorías más vendidas</h2>
         {categorias.length === 0 && <p className="text-sm text-gray-400 py-2">Sin ventas en este período.</p>}
         <div className="flex flex-col gap-1.5">
           {categorias.map((c, i) => (
             <div key={i} className="flex items-center justify-between text-sm">
-              <span className="text-gray-600 truncate pr-2">{c.categoria}</span>
+              <span className="text-gray-600 dark:text-gray-300 truncate pr-2">{c.categoria}</span>
               <span className="font-medium shrink-0">Bs {c.monto_bs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</span>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
         <h2 className="font-semibold mb-2">Horas de mayor venta</h2>
         {horasPico.length === 0 && <p className="text-sm text-gray-400 py-2">Sin ventas en este período.</p>}
         <div className="flex flex-col gap-1.5">
           {horasPico.map((h, i) => (
             <div key={i} className="flex items-center justify-between text-sm">
-              <span className="text-gray-600">{h.hora}:00 - {h.hora}:59</span>
+              <span className="text-gray-600 dark:text-gray-300">{h.hora}:00 - {h.hora}:59</span>
               <span className="font-medium">{h.num_ventas} ventas</span>
             </div>
           ))}

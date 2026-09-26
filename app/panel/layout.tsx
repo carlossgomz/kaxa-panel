@@ -19,7 +19,7 @@ export default async function PanelLayout({ children }: { children: ReactNode })
   const logo = (logoRes.rows[0]?.logo_base64 as string | null) ?? null;
 
   return (
-    <div className="min-h-screen bg-cream md:flex">
+    <div className="min-h-screen bg-cream dark:bg-[#0d1210] md:flex">
       <Sidebar negocio={sesion.negocio} rol={sesion.rol} logo={logo} />
       <div className="flex-1 min-w-0">
         <Header negocio={sesion.negocio} rol={sesion.rol} logo={logo} />

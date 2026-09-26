@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 export default function CajaFecha({ fecha }: { fecha: string }) {
   const router = useRouter();
   return (
-    <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4 flex justify-center">
+    <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4 flex justify-center">
       <input
         type="date"
         defaultValue={fecha}
         onChange={(e) => router.replace(`/panel/caja?fecha=${e.target.value}`)}
-        className="w-full max-w-[220px] rounded-lg border border-gray-300 px-4 py-2 text-sm"
+        className="w-full max-w-[220px] rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-4 py-2 text-sm"
       />
     </div>
   );

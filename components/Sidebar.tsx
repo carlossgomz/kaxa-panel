@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import LogoNegocio from "./LogoNegocio";
+import BotonTema from "./BotonTema";
 
 // Versión de escritorio de la navegación: un panel fijo a la izquierda,
 // siempre visible, en vez del botón de hamburguesa de Header.tsx (ese es
@@ -30,8 +31,8 @@ export default function Sidebar({ negocio, rol, logo }: { negocio: string; rol: 
   ];
 
   return (
-    <aside className="hidden md:flex md:flex-col md:w-60 md:shrink-0 md:h-screen md:sticky md:top-0 bg-white border-r border-kaxa-100">
-      <div className="flex items-center gap-2 px-4 py-4 border-b border-kaxa-100">
+    <aside className="hidden md:flex md:flex-col md:w-60 md:shrink-0 md:h-screen md:sticky md:top-0 bg-white dark:bg-[#141b18] border-r border-kaxa-100 dark:border-[#2a332e]">
+      <div className="flex items-center gap-2 px-4 py-4 border-b border-kaxa-100 dark:border-[#2a332e]">
         <LogoNegocio logo={logo} />
         <div className="min-w-0">
           <p className="font-semibold text-sm leading-tight truncate">{negocio}</p>
@@ -47,7 +48,7 @@ export default function Sidebar({ negocio, rol, logo }: { negocio: string; rol: 
               key={t.href}
               href={t.href}
               className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
-                activo ? "bg-kaxa-600 text-white" : "text-kaxa-900 hover:bg-kaxa-50"
+                activo ? "bg-kaxa-600 text-white" : "text-kaxa-900 dark:text-kaxa-100 hover:bg-kaxa-50 dark:hover:bg-kaxa-900/30"
               }`}
             >
               <span className="text-base leading-none">{t.icono}</span>
@@ -57,10 +58,14 @@ export default function Sidebar({ negocio, rol, logo }: { negocio: string; rol: 
         })}
       </nav>
 
-      <form action="/api/logout" method="post" className="p-3 border-t border-kaxa-100">
+      <div className="p-3 border-t border-kaxa-100 dark:border-[#2a332e]">
+        <BotonTema className="w-full" />
+      </div>
+
+      <form action="/api/logout" method="post" className="p-3 border-t border-kaxa-100 dark:border-[#2a332e]">
         <button
           type="submit"
-          className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-400 hover:bg-kaxa-50 hover:text-red-600"
+          className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-400 hover:bg-kaxa-50 dark:hover:bg-kaxa-900/30 hover:text-red-600 dark:hover:text-red-400"
         >
           <span className="text-base leading-none">⏻</span>
           Cerrar sesión

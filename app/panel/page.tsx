@@ -83,7 +83,7 @@ export default async function PanelPage() {
   return (
     <div>
       <h1 className="text-xl font-semibold mb-1">Hola 👋</h1>
-      <p className="text-sm text-gray-500 mb-4">Así va {nombreNegocio} ahora mismo.</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Así va {nombreNegocio} ahora mismo.</p>
 
       <Link
         href="/panel/venta"
@@ -95,8 +95,8 @@ export default async function PanelPage() {
       <div className="grid grid-cols-1 gap-3 md:gap-4">
         <div className="grid grid-cols-3 gap-2 md:gap-4">
           {tarjetas.map((t) => (
-            <div key={t.titulo} className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3 md:p-4">
-              <p className="text-[11px] md:text-xs text-gray-500 leading-tight">{t.titulo}</p>
+            <div key={t.titulo} className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-3 md:p-4">
+              <p className="text-[11px] md:text-xs text-gray-500 dark:text-gray-400 leading-tight">{t.titulo}</p>
               <p className="text-base md:text-xl font-semibold mt-1 leading-tight">Bs {t.bs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</p>
               <p className="text-[11px] md:text-sm text-kaxa-600 font-medium">${(t.bs / tasa).toFixed(0)}</p>
               <p className={`text-[10px] md:text-xs mt-1 leading-tight ${t.variacion === null ? "text-gray-400" : t.variacion >= 0 ? "text-green-600" : "text-red-500"}`}>
@@ -109,10 +109,10 @@ export default async function PanelPage() {
         <div className="md:grid md:grid-cols-2 md:gap-4 flex flex-col gap-3 md:gap-0">
           <Link
             href="/panel/cobrar"
-            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5 block transition-transform active:scale-[0.98] hover:border-kaxa-200"
+            className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-5 block transition-transform active:scale-[0.98] hover:border-kaxa-200"
           >
             <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-500">💵 Cuentas por cobrar</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">💵 Cuentas por cobrar</p>
               <span className="text-kaxa-400 text-sm">→</span>
             </div>
             <p className="text-2xl font-semibold mt-1">USD {deudaUsd.toFixed(2)}</p>
@@ -120,8 +120,8 @@ export default async function PanelPage() {
             <p className="text-xs text-gray-400 mt-2">Lo que te deben tus clientes a crédito, a hoy</p>
           </Link>
 
-          <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5">
-            <p className="text-sm text-gray-500">🏆 Producto más vendido este mes</p>
+          <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-5">
+            <p className="text-sm text-gray-500 dark:text-gray-400">🏆 Producto más vendido este mes</p>
             {top ? (
               <>
                 <p className="text-2xl font-semibold mt-1">{top.nombre}</p>
@@ -136,21 +136,21 @@ export default async function PanelPage() {
         <div className="grid grid-cols-3 gap-2 md:gap-4">
           <Link
             href="/panel/facturas"
-            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3 md:p-5 flex flex-col items-center gap-1 text-center transition-transform active:scale-[0.98] hover:border-kaxa-200"
+            className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-3 md:p-5 flex flex-col items-center gap-1 text-center transition-transform active:scale-[0.98] hover:border-kaxa-200"
           >
             <span className="text-xl">🧾</span>
             <span className="text-xs md:text-sm font-medium">Facturas</span>
           </Link>
           <Link
             href="/panel/inventario"
-            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3 md:p-5 flex flex-col items-center gap-1 text-center transition-transform active:scale-[0.98] hover:border-kaxa-200"
+            className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-3 md:p-5 flex flex-col items-center gap-1 text-center transition-transform active:scale-[0.98] hover:border-kaxa-200"
           >
             <span className="text-xl">📊</span>
             <span className="text-xs md:text-sm font-medium">Stock</span>
           </Link>
           <Link
             href="/panel/caja"
-            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3 md:p-5 flex flex-col items-center gap-1 text-center transition-transform active:scale-[0.98] hover:border-kaxa-200"
+            className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-3 md:p-5 flex flex-col items-center gap-1 text-center transition-transform active:scale-[0.98] hover:border-kaxa-200"
           >
             <span className="text-xl">🏦</span>
             <span className="text-xs md:text-sm font-medium">Caja</span>

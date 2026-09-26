@@ -218,13 +218,13 @@ export default function MovimientosClient({ movimientosIniciales }: { movimiento
   return (
     <div>
       <h1 className="text-xl font-semibold mb-1">Movimientos</h1>
-      <p className="text-sm text-gray-500 mb-4">Ajustes manuales de stock — mermas, donaciones, conteos físicos.</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Ajustes manuales de stock — mermas, donaciones, conteos físicos.</p>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
         <label className="block text-sm font-medium mb-1">Producto</label>
         <div className="relative">
           <input
-            className="w-full rounded-lg border border-gray-300 px-3 py-2"
+            className="w-full rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
             placeholder="Buscar por nombre o código"
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
@@ -232,10 +232,10 @@ export default function MovimientosClient({ movimientosIniciales }: { movimiento
             onBlur={() => setTimeout(() => setMostrarDropdown(false), 150)}
           />
           {mostrarDropdown && resultados.length > 0 && (
-            <ul className="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-56 overflow-y-auto">
+            <ul className="absolute z-10 left-0 right-0 mt-1 bg-white dark:bg-[#141b18] border border-gray-200 dark:border-[#2a332e] rounded-lg shadow-lg max-h-56 overflow-y-auto">
               {resultados.map((p) => (
                 <li key={p.id}>
-                  <button type="button" className="w-full text-left px-3 py-2 text-sm active:bg-kaxa-50" onMouseDown={() => seleccionarProducto(p)}>
+                  <button type="button" className="w-full text-left px-3 py-2 text-sm active:bg-kaxa-50 dark:active:bg-kaxa-900/30" onMouseDown={() => seleccionarProducto(p)}>
                     <span className="font-medium">{p.nombre}</span>
                     <span className="block text-xs text-gray-400">stock {p.stock_actual}</span>
                   </button>
@@ -254,34 +254,34 @@ export default function MovimientosClient({ movimientosIniciales }: { movimiento
       {productoSeleccionado && (
         <>
           <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
-              <p className="text-xs text-gray-500">{productoSeleccionado.nombre}</p>
+            <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
+              <p className="text-xs text-gray-500 dark:text-gray-400">{productoSeleccionado.nombre}</p>
               <p className="text-lg font-semibold mt-1">Stock: {productoSeleccionado.stock_actual}</p>
             </div>
-            <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
-              <p className="text-xs text-gray-500">Entradas / salidas totales</p>
+            <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
+              <p className="text-xs text-gray-500 dark:text-gray-400">Entradas / salidas totales</p>
               <p className="text-lg font-semibold mt-1">
                 +{totales?.entradas ?? 0} / -{totales?.salidas ?? 0}
               </p>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+          <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
             <h2 className="font-semibold mb-3">Registrar entrada / salida</h2>
-            <select className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2" value={tipo} onChange={(e) => setTipo(e.target.value as "ENTRADA" | "SALIDA")}>
+            <select className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2" value={tipo} onChange={(e) => setTipo(e.target.value as "ENTRADA" | "SALIDA")}>
               <option value="ENTRADA">Entrada</option>
               <option value="SALIDA">Salida</option>
             </select>
             <input
               type="number"
               inputMode="decimal"
-              className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+              className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
               placeholder="Cantidad"
               value={cantidad}
               onChange={(e) => setCantidad(e.target.value)}
             />
             <input
-              className="w-full mb-2 rounded-lg border border-gray-300 px-3 py-2"
+              className="w-full mb-2 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
               placeholder="Motivo (merma, donación, conteo físico...)"
               value={motivo}
               onChange={(e) => setMotivo(e.target.value)}
@@ -292,15 +292,15 @@ export default function MovimientosClient({ movimientosIniciales }: { movimiento
                 <option key={m} value={m} />
               ))}
             </datalist>
-            {mensaje && <p className="text-red-600 text-sm mb-3">{mensaje}</p>}
+            {mensaje && <p className="text-red-600 dark:text-red-400 text-sm mb-3">{mensaje}</p>}
             <button onClick={registrar} disabled={guardando} className="w-full rounded-lg bg-kaxa-600 text-white font-medium py-2.5 disabled:opacity-60">
               {guardando ? "Guardando…" : "Registrar"}
             </button>
           </div>
 
-          <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+          <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
             <h2 className="font-semibold mb-1">Desglosar en otro producto</h2>
-            <p className="text-xs text-gray-500 mb-3">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
               Para cuando algo se compra empaquetado pero se vende por unidad (ej. una caja de cigarrillos que se
               vende cigarro por cigarro, con su propio código). Esto descuenta <strong>{productoSeleccionado.nombre}</strong> como
               salida y suma stock al producto que elijas abajo, repartiendo el costo entre las unidades generadas.
@@ -310,7 +310,7 @@ export default function MovimientosClient({ movimientosIniciales }: { movimiento
             <input
               type="number"
               inputMode="decimal"
-              className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+              className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
               value={cantidadOrigen}
               onChange={(e) => setCantidadOrigen(e.target.value)}
             />
@@ -318,7 +318,7 @@ export default function MovimientosClient({ movimientosIniciales }: { movimiento
             <label className="block text-sm font-medium mb-1">Producto que recibe las unidades</label>
             <div className="relative mb-3">
               <input
-                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                className="w-full rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
                 placeholder="Buscar por nombre o código"
                 value={productoDestino ? productoDestino.nombre : destinoBusqueda}
                 onChange={(e) => {
@@ -329,10 +329,10 @@ export default function MovimientosClient({ movimientosIniciales }: { movimiento
                 onBlur={() => setTimeout(() => setMostrarDropdownDestino(false), 150)}
               />
               {mostrarDropdownDestino && resultadosDestino.length > 0 && (
-                <ul className="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-56 overflow-y-auto">
+                <ul className="absolute z-10 left-0 right-0 mt-1 bg-white dark:bg-[#141b18] border border-gray-200 dark:border-[#2a332e] rounded-lg shadow-lg max-h-56 overflow-y-auto">
                   {resultadosDestino.map((p) => (
                     <li key={p.id}>
-                      <button type="button" className="w-full text-left px-3 py-2 text-sm active:bg-kaxa-50" onMouseDown={() => seleccionarProductoDestino(p)}>
+                      <button type="button" className="w-full text-left px-3 py-2 text-sm active:bg-kaxa-50 dark:active:bg-kaxa-900/30" onMouseDown={() => seleccionarProductoDestino(p)}>
                         <span className="font-medium">{p.nombre}</span>
                         <span className="block text-xs text-gray-400">stock {p.stock_actual}</span>
                       </button>
@@ -348,17 +348,17 @@ export default function MovimientosClient({ movimientosIniciales }: { movimiento
                 <input
                   type="number"
                   inputMode="decimal"
-                  className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+                  className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
                   value={unidadesGeneradas}
                   onChange={(e) => setUnidadesGeneradas(e.target.value)}
                 />
                 <input
-                  className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+                  className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
                   placeholder="Motivo (opcional)"
                   value={motivoDesglose}
                   onChange={(e) => setMotivoDesglose(e.target.value)}
                 />
-                {mensajeDesglose && <p className="text-red-600 text-sm mb-3">{mensajeDesglose}</p>}
+                {mensajeDesglose && <p className="text-red-600 dark:text-red-400 text-sm mb-3">{mensajeDesglose}</p>}
                 <button onClick={desglosar} disabled={guardandoDesglose} className="w-full rounded-lg bg-kaxa-600 text-white font-medium py-2.5 disabled:opacity-60">
                   {guardandoDesglose ? "Desglosando…" : "Desglosar"}
                 </button>
@@ -368,7 +368,7 @@ export default function MovimientosClient({ movimientosIniciales }: { movimiento
         </>
       )}
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
         <h2 className="font-semibold mb-2">{productoSeleccionado ? `Historial — ${productoSeleccionado.nombre}` : "Movimientos recientes"}</h2>
         {movimientos.length === 0 && <p className="text-sm text-gray-400 py-2">Sin movimientos todavía.</p>}
         <div className="flex flex-col gap-2">

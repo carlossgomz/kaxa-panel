@@ -42,19 +42,19 @@ export default function StockPendienteClient({ itemsIniciales }: { itemsIniciale
   return (
     <div>
       <h1 className="text-xl font-semibold mb-1">Stock por revisar</h1>
-      <p className="text-sm text-gray-500 mb-4">
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
         Se cobraron con más cantidad de un producto de la que había en stock. Corrige el inventario real (a mano, o
         desde Movimientos) y después marcá cada una como resuelta.
       </p>
 
-      {mensaje && <p className="text-red-600 text-sm mb-3">{mensaje}</p>}
+      {mensaje && <p className="text-red-600 dark:text-red-400 text-sm mb-3">{mensaje}</p>}
 
       {items.length === 0 ? (
         <p className="text-sm text-gray-400 text-center py-8">No queda ninguna por revisar ✅</p>
       ) : (
         <div className="flex flex-col gap-2">
           {items.map((item) => (
-            <div key={item.id} className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
+            <div key={item.id} className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
               <div className="flex items-center justify-between mb-1">
                 <p className="font-medium">{item.producto_nombre}</p>
                 <p className="text-xs text-gray-400">{item.numero_ticket}</p>
@@ -67,7 +67,7 @@ export default function StockPendienteClient({ itemsIniciales }: { itemsIniciale
                 Vendió <strong>{item.cantidad_vendida}</strong> / había <strong>{item.stock_disponible}</strong>
               </p>
               {item.nota_cajero?.trim() ? (
-                <p className="text-sm text-gray-600 bg-gray-50 rounded-lg p-2 mb-3">📝 {item.nota_cajero}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-[#141b18] rounded-lg p-2 mb-3">📝 {item.nota_cajero}</p>
               ) : (
                 <p className="text-xs text-gray-400 mb-3">(sin nota del cajero)</p>
               )}

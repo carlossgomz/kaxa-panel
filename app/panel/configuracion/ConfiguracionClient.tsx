@@ -116,17 +116,17 @@ export default function ConfiguracionClient({
   return (
     <div>
       <h1 className="text-xl font-semibold mb-1">Configuración</h1>
-      <p className="text-sm text-gray-500 mb-4">Datos del negocio y personalización de Kaxa Móvil.</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Datos del negocio y personalización de Kaxa Móvil.</p>
 
-      {mensaje && <p className="text-red-600 text-sm mb-3">{mensaje}</p>}
+      {mensaje && <p className="text-red-600 dark:text-red-400 text-sm mb-3">{mensaje}</p>}
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
         <h2 className="font-semibold mb-3">Negocio</h2>
 
         <label className="block text-sm font-medium mb-1">Foto de perfil / logo</label>
         <div className="flex items-center gap-3 mb-4">
           {logo ? (
-            <img src={logo} alt="Logo del negocio" className="w-14 h-14 rounded-lg object-contain bg-white border border-kaxa-100 p-0.5" />
+            <img src={logo} alt="Logo del negocio" className="w-14 h-14 rounded-lg object-contain bg-white dark:bg-[#141b18] border border-kaxa-100 dark:border-[#2a332e] p-0.5" />
           ) : (
             <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-kaxa-400 to-kaxa-900 flex items-center justify-center text-white font-bold">
               K
@@ -152,7 +152,7 @@ export default function ConfiguracionClient({
 
         <label className="block text-sm font-medium mb-1">Nombre del negocio</label>
         <div className="flex gap-2 mb-3">
-          <input className="flex-1 rounded-lg border border-gray-300 px-3 py-2" value={nombre} onChange={(e) => setNombre(e.target.value)} />
+          <input className="flex-1 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2" value={nombre} onChange={(e) => setNombre(e.target.value)} />
           <button
             onClick={() => nombre.trim() && guardar({ nombre_negocio: nombre }, "nombre")}
             disabled={guardando === "nombre"}
@@ -165,7 +165,7 @@ export default function ConfiguracionClient({
         <label className="block text-sm font-medium mb-1">RIF</label>
         <div className="flex gap-2 mb-3">
           <input
-            className="flex-1 rounded-lg border border-gray-300 px-3 py-2"
+            className="flex-1 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
             value={rif}
             onChange={(e) => setRif(e.target.value)}
             placeholder="J-12345678-9"
@@ -182,7 +182,7 @@ export default function ConfiguracionClient({
         <label className="block text-sm font-medium mb-1">Dirección</label>
         <div className="flex gap-2 mb-3">
           <input
-            className="flex-1 rounded-lg border border-gray-300 px-3 py-2"
+            className="flex-1 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
             value={direccion}
             onChange={(e) => setDireccion(e.target.value)}
           />
@@ -198,7 +198,7 @@ export default function ConfiguracionClient({
         <label className="block text-sm font-medium mb-1">Teléfono</label>
         <div className="flex gap-2">
           <input
-            className="flex-1 rounded-lg border border-gray-300 px-3 py-2"
+            className="flex-1 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
             value={telefono}
             onChange={(e) => setTelefono(e.target.value)}
           />
@@ -212,7 +212,7 @@ export default function ConfiguracionClient({
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
         <h2 className="font-semibold mb-1">Tasa del día</h2>
         <label className="block text-sm font-medium mb-1 mt-2">Tasa del día (Bs/$)</label>
         <p className="text-xs text-gray-400 mb-2">
@@ -224,7 +224,7 @@ export default function ConfiguracionClient({
             type="number"
             step="0.01"
             inputMode="decimal"
-            className="flex-1 rounded-lg border border-gray-300 px-3 py-2"
+            className="flex-1 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
             value={tasa}
             onChange={(e) => setTasa(e.target.value)}
           />
@@ -239,7 +239,7 @@ export default function ConfiguracionClient({
       </div>
 
       {soportaPersonalizacion && (
-        <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+        <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
           <h2 className="font-semibold mb-1">Personalización</h2>
           <p className="text-xs text-gray-400 mb-3">Ocultá lo que tu negocio no usa, en el programa de escritorio y acá.</p>
           <div className="flex flex-col gap-3">
@@ -262,7 +262,7 @@ export default function ConfiguracionClient({
         </div>
       )}
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
         <h2 className="font-semibold mb-2">Acerca de</h2>
         <p className="text-sm">
           Kaxa Móvil

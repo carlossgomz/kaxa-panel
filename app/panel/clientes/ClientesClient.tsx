@@ -73,16 +73,16 @@ export default function ClientesClient({ clientesIniciales }: { clientesIniciale
   return (
     <div>
       <h1 className="text-xl font-semibold mb-1">Clientes</h1>
-      <p className="text-sm text-gray-500 mb-4">Todos tus clientes, tengan o no deuda pendiente.</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Todos tus clientes, tengan o no deuda pendiente.</p>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
         <h2 className="font-semibold mb-2">Nuevo cliente</h2>
         <form onSubmit={guardarCliente} className="flex flex-col gap-2">
-          <input className="rounded-lg border border-gray-300 px-3 py-2" placeholder="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} />
-          <input className="rounded-lg border border-gray-300 px-3 py-2" placeholder="Cédula" value={cedula} onChange={(e) => setCedula(e.target.value)} />
-          <input className="rounded-lg border border-gray-300 px-3 py-2" placeholder="Teléfono (opcional)" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
-          <input className="rounded-lg border border-gray-300 px-3 py-2" placeholder="Dirección (opcional)" value={direccion} onChange={(e) => setDireccion(e.target.value)} />
-          {mensaje && <p className="text-red-600 text-sm">{mensaje}</p>}
+          <input className="rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2" placeholder="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} />
+          <input className="rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2" placeholder="Cédula" value={cedula} onChange={(e) => setCedula(e.target.value)} />
+          <input className="rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2" placeholder="Teléfono (opcional)" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
+          <input className="rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2" placeholder="Dirección (opcional)" value={direccion} onChange={(e) => setDireccion(e.target.value)} />
+          {mensaje && <p className="text-red-600 dark:text-red-400 text-sm">{mensaje}</p>}
           <button disabled={guardando} className="rounded-lg bg-kaxa-600 text-white font-medium py-2.5 disabled:opacity-60">
             {guardando ? "Guardando…" : "Guardar"}
           </button>
@@ -90,7 +90,7 @@ export default function ClientesClient({ clientesIniciales }: { clientesIniciale
       </div>
 
       <input
-        className="w-full rounded-lg border border-gray-300 px-3 py-2 mb-3"
+        className="w-full rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2 mb-3"
         placeholder="Buscar por nombre o cédula"
         value={busqueda}
         onChange={(e) => setBusqueda(e.target.value)}
@@ -102,7 +102,7 @@ export default function ClientesClient({ clientesIniciales }: { clientesIniciale
           <Link
             key={c.id}
             href={`/panel/clientes/${c.id}`}
-            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 flex items-center justify-between transition-transform active:scale-[0.98]"
+            className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 flex items-center justify-between transition-transform active:scale-[0.98]"
           >
             <div>
               <p className="font-medium">{c.nombre}</p>
@@ -111,7 +111,7 @@ export default function ClientesClient({ clientesIniciales }: { clientesIniciale
             <div className="flex gap-1">
               {c.cliente_app_id && <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700">📱 App</span>}
               {!!c.es_empleado && <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700">👤 Empleado</span>}
-              {!!c.credito_autorizado && <span className="text-xs px-2 py-0.5 rounded-full bg-kaxa-50 text-kaxa-700">Crédito</span>}
+              {!!c.credito_autorizado && <span className="text-xs px-2 py-0.5 rounded-full bg-kaxa-50 dark:bg-kaxa-900/30 text-kaxa-700">Crédito</span>}
             </div>
           </Link>
         ))}

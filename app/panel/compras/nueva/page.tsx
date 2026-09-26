@@ -15,7 +15,7 @@ export default async function NuevaCompraPage() {
   return (
     <div>
       <h1 className="text-xl font-semibold mb-1">Nueva factura de compra</h1>
-      <p className="text-sm text-gray-500 mb-6">Copia los datos tal cual salen en la factura del proveedor.</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Copia los datos tal cual salen en la factura del proveedor.</p>
       <CompraForm proveedoresIniciales={proveedores} tasaHoy={tasa} />
     </div>
   );

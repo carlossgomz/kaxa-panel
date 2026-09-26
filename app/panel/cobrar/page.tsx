@@ -38,12 +38,12 @@ export default async function CobrarPage() {
   return (
     <div>
       <h1 className="text-xl font-semibold mb-1">Cuentas por cobrar</h1>
-      <p className="text-sm text-gray-500 mb-6">
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
         Lo que te deben tus clientes a crédito — el Bs se calcula a la tasa de hoy ({tasa.toFixed(2)} Bs/$).
       </p>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5 mb-4">
-        <p className="text-sm text-gray-500">Total pendiente</p>
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-5 mb-4">
+        <p className="text-sm text-gray-500 dark:text-gray-400">Total pendiente</p>
         <p className="text-2xl font-semibold mt-1">USD {totalUsd.toFixed(2)}</p>
         <p className="text-sm text-kaxa-600 font-medium">Bs {(totalUsd * tasa).toFixed(2)}</p>
       </div>
@@ -56,7 +56,7 @@ export default async function CobrarPage() {
           <Link
             key={c.cliente_cedula}
             href={`/panel/cobrar/${encodeURIComponent(c.cliente_cedula)}`}
-            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 flex items-center justify-between transition-transform active:scale-[0.98]"
+            className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 flex items-center justify-between transition-transform active:scale-[0.98]"
           >
             <div>
               <p className="font-medium">{c.cliente_nombre}</p>

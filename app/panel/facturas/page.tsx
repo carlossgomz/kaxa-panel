@@ -55,19 +55,19 @@ export default async function FacturasPage({
   return (
     <div>
       <h1 className="text-xl font-semibold mb-1">Facturas</h1>
-      <p className="text-sm text-gray-500 mb-4">Buscar ventas por ticket, cliente o cédula.</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Buscar ventas por ticket, cliente o cédula.</p>
 
       <FacturasFiltro desde={desde} hasta={hasta} q={termCrudo} />
 
       <div className="flex flex-col gap-2">
         {facturas.length === 0 && <p className="text-sm text-gray-400 text-center py-8">Sin facturas en ese rango/búsqueda.</p>}
         {facturas.map((f) => {
-          const estado = ESTADOS[f.estado] ?? { texto: f.estado, clase: "bg-gray-50 text-gray-600" };
+          const estado = ESTADOS[f.estado] ?? { texto: f.estado, clase: "bg-gray-50 dark:bg-[#141b18] text-gray-600 dark:text-gray-300" };
           return (
             <Link
               key={f.id}
               href={`/panel/facturas/${f.id}`}
-              className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 flex items-center justify-between transition-transform active:scale-[0.98]"
+              className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 flex items-center justify-between transition-transform active:scale-[0.98]"
             >
               <div>
                 <p className="font-medium">{f.numero_ticket}</p>

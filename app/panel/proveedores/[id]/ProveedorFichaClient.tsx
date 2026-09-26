@@ -77,24 +77,24 @@ export default function ProveedorFichaClient({
         ← Proveedores
       </Link>
       <h1 className="text-xl font-semibold mb-1">{proveedor.nombre}</h1>
-      <p className="text-sm text-gray-500 mb-4">{proveedor.rif}</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{proveedor.rif}</p>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5 mb-4">
-        <p className="text-sm text-gray-500">Saldo pendiente</p>
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-5 mb-4">
+        <p className="text-sm text-gray-500 dark:text-gray-400">Saldo pendiente</p>
         <p className={`text-2xl font-semibold mt-1 ${saldoPendienteUsd > 0 ? "text-amber-600" : ""}`}>USD {saldoPendienteUsd.toFixed(2)}</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
         <h2 className="font-semibold mb-3">Datos</h2>
         <label className="block text-sm font-medium mb-1">Nombre</label>
-        <input className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2" value={nombre} onChange={(e) => setNombre(e.target.value)} />
+        <input className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2" value={nombre} onChange={(e) => setNombre(e.target.value)} />
         <label className="block text-sm font-medium mb-1">RIF</label>
-        <input className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2" value={rif} onChange={(e) => setRif(e.target.value)} />
+        <input className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2" value={rif} onChange={(e) => setRif(e.target.value)} />
         <label className="block text-sm font-medium mb-1">Dirección</label>
-        <input className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2" value={direccion} onChange={(e) => setDireccion(e.target.value)} />
+        <input className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2" value={direccion} onChange={(e) => setDireccion(e.target.value)} />
         <label className="block text-sm font-medium mb-1">Teléfono</label>
-        <input className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
-        {mensaje && <p className="text-red-600 text-sm mb-3">{mensaje}</p>}
+        <input className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
+        {mensaje && <p className="text-red-600 dark:text-red-400 text-sm mb-3">{mensaje}</p>}
         <div className="flex gap-2">
           <button onClick={guardar} disabled={guardando} className="flex-1 rounded-lg bg-kaxa-600 text-white font-medium py-2.5 disabled:opacity-60">
             {guardando ? "Guardando…" : "Guardar cambios"}
@@ -105,7 +105,7 @@ export default function ProveedorFichaClient({
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
         <h2 className="font-semibold mb-2">Historial de facturas</h2>
         {historial.length === 0 && <p className="text-sm text-gray-400 py-2">Sin facturas registradas todavía.</p>}
         <div className="flex flex-col gap-2">

@@ -99,29 +99,29 @@ export default function CuentasClient({
   return (
     <div>
       <h1 className="text-xl font-semibold mb-1">Cuentas</h1>
-      <p className="text-sm text-gray-500 mb-6">
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
         Quién puede entrar al panel de este negocio. Si escribes el email de alguien que ya tiene cuenta, queda
         vinculado al momento; si no tiene cuenta o dejas el email en blanco, se genera un link para registrarse y
         quedar vinculado automáticamente.
       </p>
 
-      <form onSubmit={invitar} className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-6 flex flex-col gap-3">
+      <form onSubmit={invitar} className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-6 flex flex-col gap-3">
         <p className="text-sm font-medium">Invitar</p>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email de la persona (opcional)"
-          className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+          className="rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2 text-sm"
         />
-        <select value={rol} onChange={(e) => setRol(e.target.value as "ADMIN" | "CAJERO")} className="rounded-lg border border-gray-300 px-3 py-2 text-sm">
+        <select value={rol} onChange={(e) => setRol(e.target.value as "ADMIN" | "CAJERO")} className="rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2 text-sm">
           <option value="CAJERO">Cajero — solo Venta, Facturas, Cuentas por cobrar</option>
           <option value="ADMIN">Administrador — acceso completo</option>
         </select>
-        {error && <p className="text-red-600 text-sm">{error}</p>}
+        {error && <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>}
         {mensaje && <p className="text-green-600 text-sm">{mensaje}</p>}
         {linkGenerado && (
-          <div className="flex items-center gap-2 bg-kaxa-50 rounded-lg px-3 py-2">
+          <div className="flex items-center gap-2 bg-kaxa-50 dark:bg-kaxa-900/30 rounded-lg px-3 py-2">
             <p className="text-xs text-kaxa-700 truncate flex-1">{linkGenerado}</p>
             <button type="button" onClick={() => copiarLink(linkGenerado)} className="text-xs font-medium text-kaxa-700 shrink-0">
               {copiado ? "copiado ✓" : "copiar"}
@@ -142,7 +142,7 @@ export default function CuentasClient({
         <div className="flex flex-col gap-2 mb-6">
           <p className="text-xs text-gray-400 px-1">Links pendientes de usar</p>
           {invitaciones.map((inv) => (
-            <div key={inv.token} className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3 flex items-center justify-between">
+            <div key={inv.token} className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-3 flex items-center justify-between">
               <div className="min-w-0">
                 <p className="text-sm font-medium truncate">{inv.email ?? "Link abierto (cualquier email)"}</p>
                 <p className="text-xs text-gray-400">
@@ -167,7 +167,7 @@ export default function CuentasClient({
 
       <div className="flex flex-col gap-2">
         {vinculadas.map((c) => (
-          <div key={c.cuentaId} className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 flex items-center justify-between">
+          <div key={c.cuentaId} className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 flex items-center justify-between">
             <div className="min-w-0">
               <p className="text-sm font-medium truncate">{c.nombre}</p>
               <p className="text-xs text-gray-400 truncate">

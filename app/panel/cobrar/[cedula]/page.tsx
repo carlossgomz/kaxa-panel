@@ -51,10 +51,10 @@ export default async function ClienteCobrarPage({ params }: { params: { cedula: 
         ← Cuentas por cobrar
       </Link>
       <h1 className="text-xl font-semibold mb-1">{nombreCliente}</h1>
-      <p className="text-sm text-gray-500 mb-6">{cedula}</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">{cedula}</p>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5 mb-4">
-        <p className="text-sm text-gray-500">Deuda total</p>
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-5 mb-4">
+        <p className="text-sm text-gray-500 dark:text-gray-400">Deuda total</p>
         <p className="text-2xl font-semibold mt-1">USD {totalPendienteUsd.toFixed(2)}</p>
         <p className="text-sm text-kaxa-600 font-medium">Bs {(totalPendienteUsd * tasa).toFixed(2)}</p>
       </div>
@@ -69,7 +69,7 @@ export default async function ClienteCobrarPage({ params }: { params: { cedula: 
       <h2 className="font-semibold mt-6 mb-2">Ventas pendientes</h2>
       <div className="flex flex-col gap-2">
         {ventas.map((v) => (
-          <div key={v.id} className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
+          <div key={v.id} className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
             <div className="flex items-center justify-between">
               <p className="font-medium">{v.numero_ticket}</p>
               <p className="text-xs text-gray-400">{new Date(v.fecha_hora.replace(" ", "T")).toLocaleDateString("es-VE")}</p>

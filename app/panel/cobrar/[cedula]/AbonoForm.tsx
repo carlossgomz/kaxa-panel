@@ -89,18 +89,18 @@ export default function AbonoForm({
 
   if (exito) {
     return (
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5 text-center">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-5 text-center">
         <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600 text-2xl">
           ✓
         </div>
         <h2 className="font-semibold mb-1">Abono registrado con éxito</h2>
-        <p className="text-sm text-gray-500">Volviendo a la lista de cuentas por cobrar…</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Volviendo a la lista de cuentas por cobrar…</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5">
+    <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-5">
       <h2 className="font-semibold mb-1">Registrar abono</h2>
       <p className="text-xs text-gray-400 mb-4">
         Se reparte solo entre las ventas pendientes, de la más vieja a la más nueva.
@@ -108,7 +108,7 @@ export default function AbonoForm({
 
       <label className="block text-sm font-medium mb-1">Método de pago</label>
       <select
-        className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+        className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
         value={metodo}
         onChange={(e) => setMetodo(e.target.value)}
       >
@@ -124,7 +124,7 @@ export default function AbonoForm({
         type="number"
         step="0.01"
         inputMode="decimal"
-        className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+        className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
         value={monto}
         onChange={(e) => setMonto(e.target.value)}
         placeholder="0.00"
@@ -137,7 +137,7 @@ export default function AbonoForm({
             type="number"
             step="0.01"
             inputMode="decimal"
-            className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+            className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
             value={tasa}
             onChange={(e) => setTasa(e.target.value)}
           />
@@ -145,10 +145,10 @@ export default function AbonoForm({
       )}
 
       {montoNum > 0 && (
-        <p className="text-xs text-gray-500 mb-3">Equivale a USD {usdEquivalente.toFixed(2)}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Equivale a USD {usdEquivalente.toFixed(2)}</p>
       )}
 
-      {mensaje && <p className="text-red-600 text-sm mb-3">{mensaje}</p>}
+      {mensaje && <p className="text-red-600 dark:text-red-400 text-sm mb-3">{mensaje}</p>}
 
       <button
         onClick={confirmar}

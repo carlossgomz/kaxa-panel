@@ -20,7 +20,7 @@ function diasTranscurridos(fecha: string): number {
 }
 
 function colorVencimiento(dias: number): string {
-  if (dias > 30) return "text-red-600";
+  if (dias > 30) return "text-red-600 dark:text-red-400";
   if (dias > 15) return "text-amber-600";
   return "text-gray-400";
 }
@@ -107,18 +107,18 @@ function FilaFactura({
 
   if (exito) {
     return (
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 text-center">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 text-center">
         <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600 text-2xl">
           ✓
         </div>
         <h2 className="font-semibold mb-1">Pago registrado con éxito</h2>
-        <p className="text-sm text-gray-500">Factura {factura.numero_factura}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">Factura {factura.numero_factura}</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
+    <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
       <button className="w-full text-left" onClick={() => setAbierta((v) => !v)}>
         <div className="flex items-center justify-between">
           <p className="font-medium">{factura.numero_factura}</p>
@@ -133,10 +133,10 @@ function FilaFactura({
       </button>
 
       {abierta && (
-        <div className="mt-4 pt-4 border-t border-kaxa-100">
+        <div className="mt-4 pt-4 border-t border-kaxa-100 dark:border-[#2a332e]">
           <label className="block text-sm font-medium mb-1">Método de pago</label>
           <select
-            className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+            className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
             value={metodo}
             onChange={(e) => setMetodo(e.target.value)}
           >
@@ -152,7 +152,7 @@ function FilaFactura({
             type="number"
             step="0.01"
             inputMode="decimal"
-            className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+            className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
             value={monto}
             onChange={(e) => setMonto(e.target.value)}
             placeholder="0.00"
@@ -165,7 +165,7 @@ function FilaFactura({
                 type="number"
                 step="0.01"
                 inputMode="decimal"
-                className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+                className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
                 value={tasa}
                 onChange={(e) => setTasa(e.target.value)}
               />
@@ -174,13 +174,13 @@ function FilaFactura({
 
           <label className="block text-sm font-medium mb-1">Referencia (opcional)</label>
           <input
-            className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+            className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
             value={referencia}
             onChange={(e) => setReferencia(e.target.value)}
           />
 
-          {montoNum > 0 && <p className="text-xs text-gray-500 mb-3">Equivale a USD {usdEquivalente.toFixed(2)}</p>}
-          {mensaje && <p className="text-red-600 text-sm mb-3">{mensaje}</p>}
+          {montoNum > 0 && <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">Equivale a USD {usdEquivalente.toFixed(2)}</p>}
+          {mensaje && <p className="text-red-600 dark:text-red-400 text-sm mb-3">{mensaje}</p>}
 
           <button
             onClick={confirmar}
@@ -212,7 +212,7 @@ export default function PagarProveedorClient({
         ← Cuentas por pagar
       </Link>
       <h1 className="text-xl font-semibold mb-1">{proveedorNombre}</h1>
-      <p className="text-sm text-gray-500 mb-6">Saldo total: USD {totalUsd.toFixed(2)}</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Saldo total: USD {totalUsd.toFixed(2)}</p>
 
       <div className="flex flex-col gap-2">
         {facturas.map((f) => (

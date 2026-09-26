@@ -76,14 +76,14 @@ export default async function CajaPage({ searchParams }: { searchParams: { fecha
   return (
     <div>
       <h1 className="text-xl font-semibold mb-1">Cuadre de caja</h1>
-      <p className="text-sm text-gray-500 mb-4">
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
         Lo esperado en caja, calculado en vivo — el conteo físico se sigue haciendo desde el programa en la tienda.
       </p>
 
       <CajaFecha fecha={fecha} />
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5 mb-4">
-        <p className="text-sm text-gray-500">Total estimado en bolívares</p>
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-5 mb-4">
+        <p className="text-sm text-gray-500 dark:text-gray-400">Total estimado en bolívares</p>
         <p className="text-2xl font-semibold mt-1">Bs {totalBolivares.toFixed(2)}</p>
         {filasUsd.length > 0 && <p className="text-xs text-gray-400 mt-1">Incluye USD {totalUsdNativo.toFixed(2)} en Divisas</p>}
       </div>
@@ -93,7 +93,7 @@ export default async function CajaPage({ searchParams }: { searchParams: { fecha
           const esperadoNativo = f.moneda === "USD" ? f.esperado / tasa : f.esperado;
           const simbolo = f.moneda === "USD" ? "$" : "Bs";
           return (
-            <div key={f.metodo} className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 flex items-center justify-between">
+            <div key={f.metodo} className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 flex items-center justify-between">
               <p className="font-medium">{f.metodo.split("_").join(" ")}</p>
               <p className="text-sm font-semibold text-kaxa-700">
                 {simbolo} {esperadoNativo.toFixed(2)}

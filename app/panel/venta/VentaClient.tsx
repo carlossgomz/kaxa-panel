@@ -249,9 +249,9 @@ export default function VentaClient({
   if (ticketConfirmado) {
     return (
       <div className="flex flex-col items-center text-center py-10">
-        <div className="w-16 h-16 rounded-full bg-kaxa-50 flex items-center justify-center text-3xl mb-4">✅</div>
+        <div className="w-16 h-16 rounded-full bg-kaxa-50 dark:bg-kaxa-900/30 flex items-center justify-center text-3xl mb-4">✅</div>
         <h1 className="text-xl font-semibold mb-1">Venta registrada</h1>
-        <p className="text-sm text-gray-500 mb-6">Ticket {ticketConfirmado}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Ticket {ticketConfirmado}</p>
         <button
           onClick={nuevaVenta}
           className="rounded-lg bg-kaxa-600 text-white font-medium py-2.5 px-6 transition-transform active:scale-[0.98]"
@@ -265,7 +265,7 @@ export default function VentaClient({
   return (
     <div>
       <h1 className="text-xl font-semibold mb-1">Venta</h1>
-      <p className="text-sm text-gray-500 mb-4">Tasa del día: {tasaHoy.toFixed(2)} Bs/$</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Tasa del día: {tasaHoy.toFixed(2)} Bs/$</p>
 
       {/* Buscador de producto */}
       <div className="relative mb-4">
@@ -276,15 +276,15 @@ export default function VentaClient({
           onFocus={() => resultados.length > 0 && setMostrarDropdown(true)}
           onBlur={() => setTimeout(() => setMostrarDropdown(false), 150)}
           placeholder="Buscar producto por nombre o código"
-          className="w-full rounded-lg border border-gray-300 px-3 py-3 text-base"
+          className="w-full rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-3 text-base"
         />
         {mostrarDropdown && resultados.length > 0 && (
-          <ul className="absolute z-10 left-0 right-0 mt-1 bg-white border border-kaxa-100 rounded-xl shadow-lg overflow-hidden">
+          <ul className="absolute z-10 left-0 right-0 mt-1 bg-white dark:bg-[#141b18] border border-kaxa-100 dark:border-[#2a332e] rounded-xl shadow-lg overflow-hidden">
             {resultados.map((p) => (
               <li key={p.id}>
                 <button
                   onMouseDown={() => agregarAlCarrito(p)}
-                  className="w-full text-left px-3 py-2.5 flex items-center justify-between active:bg-kaxa-50 border-b border-kaxa-50 last:border-0"
+                  className="w-full text-left px-3 py-2.5 flex items-center justify-between active:bg-kaxa-50 dark:active:bg-kaxa-900/30 border-b border-kaxa-50 last:border-0"
                 >
                   <div className="min-w-0">
                     <p className="text-sm font-medium truncate">{p.nombre}</p>
@@ -302,7 +302,7 @@ export default function VentaClient({
       <div className="flex flex-col gap-2 mb-4">
         {carrito.length === 0 && <p className="text-sm text-gray-400 text-center py-6">Busca un producto para empezar.</p>}
         {carrito.map((l) => (
-          <div key={l.producto_id} className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-3">
+          <div key={l.producto_id} className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-3">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium truncate pr-2">{l.nombre}</p>
               <button onClick={() => quitarLinea(l.producto_id)} className="text-red-500 text-xs shrink-0">
@@ -313,7 +313,7 @@ export default function VentaClient({
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => cambiarCantidad(l.producto_id, l.cantidad - 1)}
-                  className="w-8 h-8 rounded-lg bg-kaxa-50 text-kaxa-700 font-semibold active:bg-kaxa-100"
+                  className="w-8 h-8 rounded-lg bg-kaxa-50 dark:bg-kaxa-900/30 text-kaxa-700 font-semibold active:bg-kaxa-100"
                 >
                   −
                 </button>
@@ -322,11 +322,11 @@ export default function VentaClient({
                   step="0.001"
                   value={l.cantidad}
                   onChange={(e) => cambiarCantidad(l.producto_id, Number(e.target.value) || 0)}
-                  className="w-14 text-center rounded-lg border border-gray-300 py-1 text-sm"
+                  className="w-14 text-center rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 py-1 text-sm"
                 />
                 <button
                   onClick={() => cambiarCantidad(l.producto_id, l.cantidad + 1)}
-                  className="w-8 h-8 rounded-lg bg-kaxa-50 text-kaxa-700 font-semibold active:bg-kaxa-100"
+                  className="w-8 h-8 rounded-lg bg-kaxa-50 dark:bg-kaxa-900/30 text-kaxa-700 font-semibold active:bg-kaxa-100"
                 >
                   +
                 </button>
@@ -338,7 +338,7 @@ export default function VentaClient({
       </div>
 
       {/* Cliente */}
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
         {cliente ? (
           <div className="flex items-center justify-between">
             <div>
@@ -358,7 +358,7 @@ export default function VentaClient({
               value={clienteBusqueda}
               onChange={(e) => setClienteBusqueda(e.target.value)}
               placeholder="Cédula o nombre del cliente"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2 text-sm"
             />
             {clienteResultados.length > 0 && (
               <ul className="mt-2 flex flex-col gap-1">
@@ -366,7 +366,7 @@ export default function VentaClient({
                   <li key={c.id}>
                     <button
                       onClick={() => seleccionarCliente(c)}
-                      className="w-full text-left px-3 py-2 rounded-lg bg-kaxa-50 active:bg-kaxa-100 text-sm"
+                      className="w-full text-left px-3 py-2 rounded-lg bg-kaxa-50 dark:bg-kaxa-900/30 active:bg-kaxa-100 text-sm"
                     >
                       {c.nombre} — {c.cedula} {c.credito_autorizado ? "(crédito ✓)" : ""}
                     </button>
@@ -387,7 +387,7 @@ export default function VentaClient({
 
       {/* Delivery (si el negocio no la desactivó desde Configuración) */}
       {mostrarDelivery && (
-        <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+        <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
           <label className="flex items-center gap-2 text-sm font-medium">
             <input
               type="checkbox"
@@ -403,7 +403,7 @@ export default function VentaClient({
             <select
               value={repartidorId ?? ""}
               onChange={(e) => setRepartidorId(e.target.value || null)}
-              className="w-full mt-3 rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="w-full mt-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2 text-sm"
             >
               <option value="">Repartidor (opcional, se puede asignar después)…</option>
               {repartidores.map((r) => (
@@ -417,9 +417,9 @@ export default function VentaClient({
       )}
 
       {/* Pagos */}
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
         {recargoDeliveryBs > 0 && (
-          <div className="flex items-center justify-between text-sm text-gray-500 mb-2 pb-2 border-b border-kaxa-50">
+          <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-2 pb-2 border-b border-kaxa-50">
             <span>
               Recargo de delivery ({totalUnidadesCarrito} × ${recargoDeliveryUsd.toFixed(2)})
             </span>
@@ -427,7 +427,7 @@ export default function VentaClient({
           </div>
         )}
         <div className="flex items-center justify-between mb-3">
-          <p className="text-sm text-gray-500">Total</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Total</p>
           <p className="text-xl font-semibold">Bs {total.toFixed(2)}</p>
         </div>
 
@@ -451,7 +451,7 @@ export default function VentaClient({
                 <button
                   key={m}
                   onClick={() => cobrarCompletoCon(m)}
-                  className="rounded-full bg-kaxa-50 text-kaxa-700 text-xs font-medium px-3 py-1.5 active:bg-kaxa-100"
+                  className="rounded-full bg-kaxa-50 dark:bg-kaxa-900/30 text-kaxa-700 text-xs font-medium px-3 py-1.5 active:bg-kaxa-100"
                 >
                   {m.split("_").join(" ")}
                 </button>
@@ -465,8 +465,8 @@ export default function VentaClient({
         </button>
 
         {mostrarDividir && (
-          <div className="mt-3 pt-3 border-t border-kaxa-100 flex flex-col gap-2">
-            <select value={metodoNuevo} onChange={(e) => setMetodoNuevo(e.target.value)} className="rounded-lg border border-gray-300 px-3 py-2 text-sm">
+          <div className="mt-3 pt-3 border-t border-kaxa-100 dark:border-[#2a332e] flex flex-col gap-2">
+            <select value={metodoNuevo} onChange={(e) => setMetodoNuevo(e.target.value)} className="rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2 text-sm">
               {METODOS_PAGO.map((m) => (
                 <option key={m} value={m}>
                   {m.split("_").join(" ")}
@@ -480,27 +480,27 @@ export default function VentaClient({
               value={montoNuevo}
               onChange={(e) => setMontoNuevo(e.target.value)}
               placeholder={monedaDeMetodo(metodoNuevo) === "USD" ? "Monto en $" : "Monto en Bs"}
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2 text-sm"
             />
             <input
               value={refNueva}
               onChange={(e) => setRefNueva(e.target.value)}
               placeholder="Referencia (opcional)"
-              className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+              className="rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2 text-sm"
             />
-            <button onClick={agregarPago} className="rounded-lg bg-kaxa-50 text-kaxa-700 font-medium py-2 text-sm active:bg-kaxa-100">
+            <button onClick={agregarPago} className="rounded-lg bg-kaxa-50 dark:bg-kaxa-900/30 text-kaxa-700 font-medium py-2 text-sm active:bg-kaxa-100">
               Agregar pago
             </button>
           </div>
         )}
 
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-kaxa-100">
-          <p className="text-sm text-gray-500">{restante > 0.009 ? "Falta" : restante < -0.009 ? "Sobra" : "Pagado"}</p>
-          <p className={`text-sm font-semibold ${restante > 0.009 ? "text-red-600" : "text-green-600"}`}>Bs {Math.abs(restante).toFixed(2)}</p>
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-kaxa-100 dark:border-[#2a332e]">
+          <p className="text-sm text-gray-500 dark:text-gray-400">{restante > 0.009 ? "Falta" : restante < -0.009 ? "Sobra" : "Pagado"}</p>
+          <p className={`text-sm font-semibold ${restante > 0.009 ? "text-red-600 dark:text-red-400" : "text-green-600"}`}>Bs {Math.abs(restante).toFixed(2)}</p>
         </div>
       </div>
 
-      {mensaje && <p className="text-red-600 text-sm mb-3">{mensaje}</p>}
+      {mensaje && <p className="text-red-600 dark:text-red-400 text-sm mb-3">{mensaje}</p>}
 
       <button
         onClick={confirmarVenta}

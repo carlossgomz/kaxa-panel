@@ -57,16 +57,16 @@ export default function ProveedoresClient({ proveedoresIniciales }: { proveedore
   return (
     <div>
       <h1 className="text-xl font-semibold mb-1">Proveedores</h1>
-      <p className="text-sm text-gray-500 mb-4">Todos tus proveedores, tengan o no facturas pendientes.</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Todos tus proveedores, tengan o no facturas pendientes.</p>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
         <h2 className="font-semibold mb-2">Nuevo proveedor</h2>
         <form onSubmit={guardarProveedor} className="flex flex-col gap-2">
-          <input className="rounded-lg border border-gray-300 px-3 py-2" placeholder="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} />
-          <input className="rounded-lg border border-gray-300 px-3 py-2" placeholder="RIF" value={rif} onChange={(e) => setRif(e.target.value)} />
-          <input className="rounded-lg border border-gray-300 px-3 py-2" placeholder="Dirección (opcional)" value={direccion} onChange={(e) => setDireccion(e.target.value)} />
-          <input className="rounded-lg border border-gray-300 px-3 py-2" placeholder="Teléfono (opcional)" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
-          {mensaje && <p className="text-red-600 text-sm">{mensaje}</p>}
+          <input className="rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2" placeholder="Nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} />
+          <input className="rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2" placeholder="RIF" value={rif} onChange={(e) => setRif(e.target.value)} />
+          <input className="rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2" placeholder="Dirección (opcional)" value={direccion} onChange={(e) => setDireccion(e.target.value)} />
+          <input className="rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2" placeholder="Teléfono (opcional)" value={telefono} onChange={(e) => setTelefono(e.target.value)} />
+          {mensaje && <p className="text-red-600 dark:text-red-400 text-sm">{mensaje}</p>}
           <button disabled={guardando} className="rounded-lg bg-kaxa-600 text-white font-medium py-2.5 disabled:opacity-60">
             {guardando ? "Guardando…" : "Guardar"}
           </button>
@@ -74,7 +74,7 @@ export default function ProveedoresClient({ proveedoresIniciales }: { proveedore
       </div>
 
       <input
-        className="w-full rounded-lg border border-gray-300 px-3 py-2 mb-3"
+        className="w-full rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2 mb-3"
         placeholder="Buscar por nombre o RIF"
         value={busqueda}
         onChange={(e) => setBusqueda(e.target.value)}
@@ -86,7 +86,7 @@ export default function ProveedoresClient({ proveedoresIniciales }: { proveedore
           <Link
             key={p.id}
             href={`/panel/proveedores/${p.id}`}
-            className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 flex items-center justify-between transition-transform active:scale-[0.98]"
+            className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 flex items-center justify-between transition-transform active:scale-[0.98]"
           >
             <div>
               <p className="font-medium">{p.nombre}</p>

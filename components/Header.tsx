@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import LogoNegocio from "./LogoNegocio";
+import BotonTema from "./BotonTema";
 
 // Encabezado fijo arriba con un botón de hamburguesa que despliega las
 // secciones en un menú lateral — reemplaza la barra de pestañas horizontal
@@ -40,13 +41,13 @@ export default function Header({ negocio, rol, logo }: { negocio: string; rol: s
 
   return (
     <>
-      <header className="md:hidden sticky top-0 z-20 bg-white/90 backdrop-blur border-b border-kaxa-100">
+      <header className="md:hidden sticky top-0 z-20 bg-white/90 dark:bg-[#141b18]/90 backdrop-blur border-b border-kaxa-100 dark:border-[#2a332e]">
         <div className="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
             <button
               onClick={() => setMenuAbierto(true)}
               aria-label="Abrir menú"
-              className="shrink-0 w-9 h-9 -ml-2 flex items-center justify-center text-gray-500 active:text-kaxa-700 active:bg-kaxa-50 rounded-lg"
+              className="shrink-0 w-9 h-9 -ml-2 flex items-center justify-center text-gray-500 dark:text-gray-400 active:text-kaxa-700 active:bg-kaxa-50 dark:active:bg-kaxa-900/30 rounded-lg"
             >
               <span className="text-xl leading-none">☰</span>
             </button>
@@ -60,7 +61,7 @@ export default function Header({ negocio, rol, logo }: { negocio: string; rol: s
             <button
               type="submit"
               aria-label="Cerrar sesión"
-              className="shrink-0 text-gray-400 active:text-gray-600 text-lg leading-none p-2 -m-2"
+              className="shrink-0 text-gray-400 active:text-gray-600 dark:active:text-gray-300 text-lg leading-none p-2 -m-2"
             >
               ⏻
             </button>
@@ -75,7 +76,7 @@ export default function Header({ negocio, rol, logo }: { negocio: string; rol: s
             onClick={() => setMenuAbierto(false)}
             className="absolute inset-0 bg-black/40"
           />
-          <nav className="absolute left-0 top-0 bottom-0 w-64 max-w-[80%] bg-white shadow-xl flex flex-col p-3 pt-4 overflow-y-auto">
+          <nav className="absolute left-0 top-0 bottom-0 w-64 max-w-[80%] bg-white dark:bg-[#141b18] shadow-xl flex flex-col p-3 pt-4 overflow-y-auto">
             <div className="flex items-center gap-2 px-2 mb-3">
               <LogoNegocio logo={logo} />
               <div className="min-w-0">
@@ -90,7 +91,7 @@ export default function Header({ negocio, rol, logo }: { negocio: string; rol: s
                   key={t.href}
                   href={t.href}
                   className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors ${
-                    activo ? "bg-kaxa-600 text-white" : "text-kaxa-900 active:bg-kaxa-50"
+                    activo ? "bg-kaxa-600 text-white" : "text-kaxa-900 dark:text-kaxa-100 active:bg-kaxa-50 dark:active:bg-kaxa-900/30"
                   }`}
                 >
                   <span className="text-lg leading-none">{t.icono}</span>
@@ -98,6 +99,9 @@ export default function Header({ negocio, rol, logo }: { negocio: string; rol: s
                 </Link>
               );
             })}
+            <div className="mt-2 pt-2 border-t border-kaxa-100 dark:border-[#2a332e]">
+              <BotonTema className="w-full" />
+            </div>
           </nav>
         </div>
       )}

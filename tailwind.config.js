@@ -1,6 +1,10 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./app/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
+  // "class" en vez del default "media" — el tema se elige a mano (ver
+  // lib/tema.ts) y se guarda por dispositivo, no sigue la preferencia del
+  // sistema operativo.
+  darkMode: "class",
   theme: {
     extend: {
       colors: {

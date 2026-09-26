@@ -395,12 +395,12 @@ export default function CompraForm({
 
   if (exito) {
     return (
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5 text-center">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-5 text-center">
         <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-green-600 text-2xl">
           ✓
         </div>
         <h2 className="font-semibold mb-1">Factura registrada con éxito</h2>
-        <p className="text-sm text-gray-500">El stock ya quedó actualizado. Volviendo a Compras…</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">El stock ya quedó actualizado. Volviendo a Compras…</p>
       </div>
     );
   }
@@ -408,12 +408,12 @@ export default function CompraForm({
   return (
     <div className="flex flex-col gap-4">
       {/* --- Proveedor --- */}
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
         <label className="block text-sm font-medium mb-1">Proveedor</label>
         {!mostrarNuevoProveedor ? (
           <>
             <select
-              className="w-full mb-2 rounded-lg border border-gray-300 px-3 py-2"
+              className="w-full mb-2 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
               value={proveedorId}
               onChange={(e) => setProveedorId(e.target.value)}
             >
@@ -429,16 +429,16 @@ export default function CompraForm({
             </button>
           </>
         ) : (
-          <div className="border-t border-kaxa-100 pt-3 mt-1">
+          <div className="border-t border-kaxa-100 dark:border-[#2a332e] pt-3 mt-1">
             <label className="block text-sm font-medium mb-1">Nombre</label>
             <input
-              className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+              className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
               value={nombreProv}
               onChange={(e) => setNombreProv(e.target.value)}
             />
             <label className="block text-sm font-medium mb-1">RIF</label>
-            <input className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2" value={rifProv} onChange={(e) => setRifProv(e.target.value)} />
-            {errorProveedor && <p className="text-red-600 text-sm mb-3">{errorProveedor}</p>}
+            <input className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2" value={rifProv} onChange={(e) => setRifProv(e.target.value)} />
+            {errorProveedor && <p className="text-red-600 dark:text-red-400 text-sm mb-3">{errorProveedor}</p>}
             <div className="flex gap-2">
               <button
                 type="button"
@@ -457,10 +457,10 @@ export default function CompraForm({
       </div>
 
       {/* --- Cabecera de la factura --- */}
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
         <label className="block text-sm font-medium mb-1">N.º de factura</label>
         <input
-          className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+          className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
           value={numeroFactura}
           onChange={(e) => setNumeroFactura(e.target.value)}
         />
@@ -468,7 +468,7 @@ export default function CompraForm({
           <div className="flex-1">
             <label className="block text-sm font-medium mb-1">Moneda</label>
             <select
-              className="w-full rounded-lg border border-gray-300 px-3 py-2"
+              className="w-full rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
               value={moneda}
               onChange={(e) => setMoneda(e.target.value as "USD" | "VES")}
             >
@@ -483,7 +483,7 @@ export default function CompraForm({
                 type="number"
                 step="0.01"
                 inputMode="decimal"
-                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                className="w-full rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
                 value={tasaFactura}
                 onChange={(e) => setTasaFactura(e.target.value)}
               />
@@ -493,13 +493,13 @@ export default function CompraForm({
       </div>
 
       {/* --- Agregar producto --- */}
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
         <h2 className="font-semibold mb-3">Agregar producto</h2>
 
         <label className="block text-sm font-medium mb-1">Buscar producto</label>
         <div className="relative mb-1">
           <input
-            className="w-full rounded-lg border border-gray-300 px-3 py-2"
+            className="w-full rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
             value={busqueda}
             onChange={(e) => {
               setBusqueda(e.target.value);
@@ -511,12 +511,12 @@ export default function CompraForm({
             placeholder="Nombre o código…"
           />
           {mostrarDropdown && resultados.length > 0 && (
-            <ul className="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-56 overflow-y-auto">
+            <ul className="absolute z-10 left-0 right-0 mt-1 bg-white dark:bg-[#141b18] border border-gray-200 dark:border-[#2a332e] rounded-lg shadow-lg max-h-56 overflow-y-auto">
               {resultados.map((p) => (
                 <li key={p.id}>
                   <button
                     type="button"
-                    className="w-full text-left px-3 py-2 text-sm active:bg-kaxa-50"
+                    className="w-full text-left px-3 py-2 text-sm active:bg-kaxa-50 dark:active:bg-kaxa-900/30"
                     onMouseDown={() => seleccionarProducto(p)}
                   >
                     <span className="font-medium">{p.nombre}</span>
@@ -542,13 +542,13 @@ export default function CompraForm({
           <div className="mb-3">
             <label className="block text-sm font-medium mb-1">Nombre del producto nuevo</label>
             <input
-              className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+              className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
               value={nombreNuevo}
               onChange={(e) => setNombreNuevo(e.target.value)}
             />
             <label className="block text-sm font-medium mb-1">Categoría (opcional)</label>
             <input
-              className="w-full rounded-lg border border-gray-300 px-3 py-2"
+              className="w-full rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
               value={categoriaNuevo}
               onChange={(e) => setCategoriaNuevo(e.target.value)}
             />
@@ -560,15 +560,15 @@ export default function CompraForm({
             <div className="grid grid-cols-3 gap-2 mb-3">
               <div>
                 <label className="block text-xs font-medium mb-1">Cajas</label>
-                <input type="number" inputMode="decimal" className="w-full rounded-lg border border-gray-300 px-2 py-2" value={cajas} onChange={(e) => setCajas(e.target.value)} />
+                <input type="number" inputMode="decimal" className="w-full rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-2 py-2" value={cajas} onChange={(e) => setCajas(e.target.value)} />
               </div>
               <div>
                 <label className="block text-xs font-medium mb-1">Und./caja</label>
-                <input type="number" inputMode="decimal" className="w-full rounded-lg border border-gray-300 px-2 py-2" value={unidadesPorPaquete} onChange={(e) => setUnidadesPorPaquete(e.target.value)} />
+                <input type="number" inputMode="decimal" className="w-full rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-2 py-2" value={unidadesPorPaquete} onChange={(e) => setUnidadesPorPaquete(e.target.value)} />
               </div>
               <div>
                 <label className="block text-xs font-medium mb-1">Suelta</label>
-                <input type="number" inputMode="decimal" className="w-full rounded-lg border border-gray-300 px-2 py-2" value={unidadSuelta} onChange={(e) => setUnidadSuelta(e.target.value)} />
+                <input type="number" inputMode="decimal" className="w-full rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-2 py-2" value={unidadSuelta} onChange={(e) => setUnidadSuelta(e.target.value)} />
               </div>
             </div>
 
@@ -577,11 +577,11 @@ export default function CompraForm({
                 <label className="block text-xs font-medium mb-1">
                   Precio {cajasNum > 0 ? "de la caja" : "unitario"} ({moneda === "VES" ? "Bs" : "$"})
                 </label>
-                <input type="number" step="0.01" inputMode="decimal" className="w-full rounded-lg border border-gray-300 px-2 py-2" value={precioPaquete} onChange={(e) => setPrecioPaquete(e.target.value)} />
+                <input type="number" step="0.01" inputMode="decimal" className="w-full rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-2 py-2" value={precioPaquete} onChange={(e) => setPrecioPaquete(e.target.value)} />
               </div>
               <div>
                 <label className="block text-xs font-medium mb-1">Margen %</label>
-                <input type="number" inputMode="decimal" className="w-full rounded-lg border border-gray-300 px-2 py-2" value={margen} onChange={(e) => setMargen(e.target.value)} />
+                <input type="number" inputMode="decimal" className="w-full rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-2 py-2" value={margen} onChange={(e) => setMargen(e.target.value)} />
               </div>
             </div>
 
@@ -594,7 +594,7 @@ export default function CompraForm({
                 <input
                   type="number"
                   inputMode="decimal"
-                  className="w-20 rounded-lg border border-gray-300 px-2 py-1"
+                  className="w-20 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-2 py-1"
                   value={tasaIva}
                   onChange={(e) => setTasaIva(e.target.value)}
                 />
@@ -607,7 +607,7 @@ export default function CompraForm({
                 <input
                   type="number"
                   inputMode="decimal"
-                  className="w-20 rounded-lg border border-gray-300 px-2 py-1"
+                  className="w-20 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-2 py-1"
                   value={descuento}
                   onChange={(e) => setDescuento(e.target.value)}
                 />
@@ -615,7 +615,7 @@ export default function CompraForm({
             </div>
 
             {precioPaqueteNum > 0 && (
-              <div className="bg-kaxa-50 rounded-lg p-3 mb-3 text-sm text-kaxa-900">
+              <div className="bg-kaxa-50 dark:bg-kaxa-900/30 rounded-lg p-3 mb-3 text-sm text-kaxa-900 dark:text-kaxa-100">
                 Se agregarán <strong>{cantidadPreview}</strong> unidades a costo de <strong>{costoUnitPreviewMoneda.toFixed(4)}</strong> {moneda} c/u
                 {(aplicaDescuento || aplicaIva) && (
                   <>
@@ -626,11 +626,11 @@ export default function CompraForm({
                 )}{" "}
                 · Total de esta línea: <strong>{totalLineaPreviewMoneda.toFixed(2)} {moneda}</strong>
                 <br />
-                <span className="text-xs text-gray-500">Compara este total contra el de la factura de papel.</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">Compara este total contra el de la factura de papel.</span>
               </div>
             )}
 
-            {mensaje && <p className="text-red-600 text-sm mb-3">{mensaje}</p>}
+            {mensaje && <p className="text-red-600 dark:text-red-400 text-sm mb-3">{mensaje}</p>}
 
             <button
               type="button"
@@ -645,7 +645,7 @@ export default function CompraForm({
 
       {/* --- Líneas ya agregadas --- */}
       {lineas.length > 0 && (
-        <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
+        <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
           <h2 className="font-semibold mb-3">Productos en esta factura ({lineas.length})</h2>
           <div className="flex flex-col gap-2">
             {lineas.map((l, i) => {
@@ -671,7 +671,7 @@ export default function CompraForm({
       )}
 
       {mensaje && lineas.length === 0 && !productoSeleccionado && !creandoProductoNuevo && (
-        <p className="text-red-600 text-sm">{mensaje}</p>
+        <p className="text-red-600 dark:text-red-400 text-sm">{mensaje}</p>
       )}
 
       <button

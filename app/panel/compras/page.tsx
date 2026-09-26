@@ -32,7 +32,7 @@ export default async function ComprasPage() {
   return (
     <div>
       <h1 className="text-xl font-semibold mb-1">Compras</h1>
-      <p className="text-sm text-gray-500 mb-4">Registra la mercancía que recibes de tus proveedores.</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Registra la mercancía que recibes de tus proveedores.</p>
 
       <Link
         href="/panel/compras/nueva"
@@ -47,9 +47,9 @@ export default async function ComprasPage() {
           <p className="text-sm text-gray-400 text-center py-8">Todavía no registraste ninguna compra.</p>
         )}
         {facturas.map((f) => {
-          const estado = ESTADOS[f.estado] ?? { texto: f.estado, clase: "bg-gray-50 text-gray-600" };
+          const estado = ESTADOS[f.estado] ?? { texto: f.estado, clase: "bg-gray-50 dark:bg-[#141b18] text-gray-600 dark:text-gray-300" };
           return (
-            <div key={f.id} className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 flex items-center justify-between">
+            <div key={f.id} className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 flex items-center justify-between">
               <div>
                 <p className="font-medium">{f.proveedor_nombre}</p>
                 <p className="text-xs text-gray-400">

@@ -66,32 +66,32 @@ export default function ClienteFichaClient({
       <h1 className="text-xl font-semibold mb-1">
         {cliente.nombre} {cliente.cliente_app_id && <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700 align-middle">📱 App</span>}
       </h1>
-      <p className="text-sm text-gray-500 mb-4">{cliente.cedula}</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{cliente.cedula}</p>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-5 mb-4">
-        <p className="text-sm text-gray-500">Saldo pendiente</p>
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-5 mb-4">
+        <p className="text-sm text-gray-500 dark:text-gray-400">Saldo pendiente</p>
         <p className={`text-2xl font-semibold mt-1 ${saldoPendienteUsd > 0 ? "text-amber-600" : ""}`}>USD {saldoPendienteUsd.toFixed(2)}</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
         <h2 className="font-semibold mb-3">Datos</h2>
         <label className="block text-sm font-medium mb-1">Nombre</label>
         <input
-          className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+          className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
           onBlur={() => nombre.trim() && nombre !== cliente.nombre && guardar({ nombre })}
         />
         <label className="block text-sm font-medium mb-1">Cédula</label>
         <input
-          className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+          className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
           value={cedula}
           onChange={(e) => setCedula(e.target.value)}
           onBlur={() => cedula.trim() && cedula !== cliente.cedula && guardar({ cedula })}
         />
         <label className="block text-sm font-medium mb-1">Teléfono</label>
         <input
-          className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+          className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
           placeholder="Sin teléfono registrado"
           value={telefono}
           onChange={(e) => setTelefono(e.target.value)}
@@ -99,7 +99,7 @@ export default function ClienteFichaClient({
         />
         <label className="block text-sm font-medium mb-1">Dirección</label>
         <input
-          className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+          className="w-full mb-3 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
           placeholder="Sin dirección registrada"
           value={direccion}
           onChange={(e) => setDireccion(e.target.value)}
@@ -130,10 +130,10 @@ export default function ClienteFichaClient({
           </label>
         </div>
         {guardando && <p className="text-xs text-gray-400 mt-2">Guardando…</p>}
-        {mensaje && <p className="text-red-600 text-sm mt-2">{mensaje}</p>}
+        {mensaje && <p className="text-red-600 dark:text-red-400 text-sm mt-2">{mensaje}</p>}
       </div>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
+      <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
         <h2 className="font-semibold mb-2">Historial de compras</h2>
         {historial.length === 0 && <p className="text-sm text-gray-400 py-2">Sin compras registradas todavía.</p>}
         <div className="flex flex-col gap-2">

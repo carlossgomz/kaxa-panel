@@ -90,7 +90,7 @@ export default async function InventarioPage({
   return (
     <div>
       <h1 className="text-xl font-semibold mb-1">Inventario</h1>
-      <p className="text-sm text-gray-500 mb-4">
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
         Stock y precio de venta a la tasa de hoy ({tasa.toFixed(2)} Bs/$) — {productos.length}{" "}
         {productos.length === 1 ? "producto" : "productos"}.
       </p>
@@ -102,7 +102,7 @@ export default async function InventarioPage({
           <Link
             href={hrefPagina(pagina - 1)}
             aria-disabled={pagina === 0}
-            className={`px-3 py-1.5 rounded-lg border border-kaxa-100 bg-white ${pagina === 0 ? "opacity-40 pointer-events-none" : "active:bg-kaxa-50"}`}
+            className={`px-3 py-1.5 rounded-lg border border-kaxa-100 dark:border-[#2a332e] bg-white dark:bg-[#141b18] ${pagina === 0 ? "opacity-40 pointer-events-none" : "active:bg-kaxa-50 dark:active:bg-kaxa-900/30"}`}
           >
             ← Anterior
           </Link>
@@ -112,7 +112,7 @@ export default async function InventarioPage({
           <Link
             href={hrefPagina(pagina + 1)}
             aria-disabled={pagina >= totalPaginas - 1}
-            className={`px-3 py-1.5 rounded-lg border border-kaxa-100 bg-white ${pagina >= totalPaginas - 1 ? "opacity-40 pointer-events-none" : "active:bg-kaxa-50"}`}
+            className={`px-3 py-1.5 rounded-lg border border-kaxa-100 dark:border-[#2a332e] bg-white dark:bg-[#141b18] ${pagina >= totalPaginas - 1 ? "opacity-40 pointer-events-none" : "active:bg-kaxa-50 dark:active:bg-kaxa-900/30"}`}
           >
             Siguiente →
           </Link>
@@ -124,14 +124,14 @@ export default async function InventarioPage({
         {productosPagina.map((p) => {
           const estado = estadoStock(p);
           return (
-            <div key={p.codigo_barra} className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
+            <div key={p.codigo_barra} className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
               <div className="flex items-center justify-between">
                 <p className="font-medium">{p.nombre}</p>
                 <span className={`text-xs px-2 py-0.5 rounded-full shrink-0 ml-2 ${BADGE[estado]}`}>{ETIQUETA[estado]}</span>
               </div>
               <div className="flex items-center justify-between mt-1 text-sm">
                 <p className="text-gray-400 text-xs">{p.codigo_barra}</p>
-                <p className="text-gray-500">
+                <p className="text-gray-500 dark:text-gray-400">
                   Stock: <span className="font-medium text-gray-800">{formatearStock(p.stock_actual)}</span>
                 </p>
               </div>
@@ -146,7 +146,7 @@ export default async function InventarioPage({
           <Link
             href={hrefPagina(pagina - 1)}
             aria-disabled={pagina === 0}
-            className={`px-3 py-1.5 rounded-lg border border-kaxa-100 bg-white ${pagina === 0 ? "opacity-40 pointer-events-none" : "active:bg-kaxa-50"}`}
+            className={`px-3 py-1.5 rounded-lg border border-kaxa-100 dark:border-[#2a332e] bg-white dark:bg-[#141b18] ${pagina === 0 ? "opacity-40 pointer-events-none" : "active:bg-kaxa-50 dark:active:bg-kaxa-900/30"}`}
           >
             ← Anterior
           </Link>
@@ -156,7 +156,7 @@ export default async function InventarioPage({
           <Link
             href={hrefPagina(pagina + 1)}
             aria-disabled={pagina >= totalPaginas - 1}
-            className={`px-3 py-1.5 rounded-lg border border-kaxa-100 bg-white ${pagina >= totalPaginas - 1 ? "opacity-40 pointer-events-none" : "active:bg-kaxa-50"}`}
+            className={`px-3 py-1.5 rounded-lg border border-kaxa-100 dark:border-[#2a332e] bg-white dark:bg-[#141b18] ${pagina >= totalPaginas - 1 ? "opacity-40 pointer-events-none" : "active:bg-kaxa-50 dark:active:bg-kaxa-900/30"}`}
           >
             Siguiente →
           </Link>

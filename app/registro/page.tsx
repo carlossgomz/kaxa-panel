@@ -72,16 +72,16 @@ function RegistroForm() {
   if (listo) {
     return (
       <main className="min-h-screen flex items-center justify-center px-4">
-        <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-kaxa-100 p-6 text-center">
-          <div className="w-12 h-12 mx-auto rounded-full bg-kaxa-50 flex items-center justify-center text-2xl mb-3">✅</div>
+        <div className="w-full max-w-sm bg-white dark:bg-[#141b18] rounded-2xl shadow-sm border border-kaxa-100 dark:border-[#2a332e] p-6 text-center">
+          <div className="w-12 h-12 mx-auto rounded-full bg-kaxa-50 dark:bg-kaxa-900/30 flex items-center justify-center text-2xl mb-3">✅</div>
           <h1 className="text-lg font-semibold mb-2">Cuenta creada</h1>
           {vinculado ? (
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
               Ya quedaste vinculado a <span className="font-medium">{vinculado.negocio}</span> como{" "}
               {vinculado.rol === "ADMIN" ? "administrador" : "cajero"}. Ya puedes iniciar sesión.
             </p>
           ) : (
-            <p className="text-sm text-gray-500 mb-6">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
               {avisoInvitacion ? `${avisoInvitacion} ` : ""}
               Pídele a quien administra el negocio en Kaxa que te vincule desde Cuentas, dentro del panel, con este
               email: <span className="font-medium">{email}</span>
@@ -97,7 +97,7 @@ function RegistroForm() {
 
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
-      <form onSubmit={enviar} className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-kaxa-100 p-6">
+      <form onSubmit={enviar} className="w-full max-w-sm bg-white dark:bg-[#141b18] rounded-2xl shadow-sm border border-kaxa-100 dark:border-[#2a332e] p-6">
         <div className="flex items-center gap-2 mb-1">
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-kaxa-400 to-kaxa-900 flex items-center justify-center text-white font-bold">
             K
@@ -105,22 +105,22 @@ function RegistroForm() {
           <span className="font-semibold text-lg">Kaxa Panel</span>
         </div>
         {invitacionInfo && "negocio" in invitacionInfo ? (
-          <p className="text-sm bg-kaxa-50 text-kaxa-700 rounded-lg px-3 py-2 mb-6">
+          <p className="text-sm bg-kaxa-50 dark:bg-kaxa-900/30 text-kaxa-700 rounded-lg px-3 py-2 mb-6">
             Te invitaron a <span className="font-medium">{invitacionInfo.negocio}</span> como{" "}
             {invitacionInfo.rol === "ADMIN" ? "administrador" : "cajero"} — al crear tu cuenta quedas vinculado directo.
           </p>
         ) : invitacionInfo && "error" in invitacionInfo ? (
-          <p className="text-sm bg-red-50 text-red-600 rounded-lg px-3 py-2 mb-6">
+          <p className="text-sm bg-red-50 text-red-600 dark:text-red-400 rounded-lg px-3 py-2 mb-6">
             Ese link de invitación ya no es válido (vencido o ya usado) — puedes registrarte igual, pero luego
             tendrán que vincularte a mano.
           </p>
         ) : (
-          <p className="text-sm text-gray-500 mb-6">Crea tu cuenta — después te vinculan al negocio.</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Crea tu cuenta — después te vinculan al negocio.</p>
         )}
 
         <label className="block text-sm font-medium mb-1">Nombre</label>
         <input
-          className="w-full mb-4 rounded-lg border border-gray-300 px-3 py-2"
+          className="w-full mb-4 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
           required
@@ -128,7 +128,7 @@ function RegistroForm() {
 
         <label className="block text-sm font-medium mb-1">Apellido</label>
         <input
-          className="w-full mb-4 rounded-lg border border-gray-300 px-3 py-2"
+          className="w-full mb-4 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
           value={apellido}
           onChange={(e) => setApellido(e.target.value)}
           required
@@ -137,7 +137,7 @@ function RegistroForm() {
         <label className="block text-sm font-medium mb-1">Email</label>
         <input
           type="email"
-          className="w-full mb-4 rounded-lg border border-gray-300 px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500"
+          className="w-full mb-4 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2 disabled:bg-gray-100 disabled:text-gray-500 dark:disabled:bg-[#141b18] dark:disabled:text-gray-400"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={!!invitacionInfo && "negocio" in invitacionInfo && invitacionInfo.email !== null}
@@ -147,7 +147,7 @@ function RegistroForm() {
         <label className="block text-sm font-medium mb-1">Contraseña</label>
         <input
           type="password"
-          className="w-full mb-1 rounded-lg border border-gray-300 px-3 py-2"
+          className="w-full mb-1 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           minLength={6}
@@ -158,14 +158,14 @@ function RegistroForm() {
         <label className="block text-sm font-medium mb-1">Confirmar contraseña</label>
         <input
           type="password"
-          className="w-full mb-5 rounded-lg border border-gray-300 px-3 py-2"
+          className="w-full mb-5 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
           value={confirmarPassword}
           onChange={(e) => setConfirmarPassword(e.target.value)}
           minLength={6}
           required
         />
 
-        {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
+        {error && <p className="text-red-600 dark:text-red-400 text-sm mb-4">{error}</p>}
 
         <button
           type="submit"

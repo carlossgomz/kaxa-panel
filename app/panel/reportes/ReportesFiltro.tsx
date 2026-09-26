@@ -19,18 +19,18 @@ export default function ReportesFiltro({ desde, hasta }: { desde: string; hasta:
   }, [valores]);
 
   return (
-    <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4 flex gap-2">
+    <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4 flex gap-2">
       <input
         type="date"
         value={valores.desde}
         onChange={(e) => setValores((v) => ({ ...v, desde: e.target.value }))}
-        className="flex-1 rounded-lg border border-gray-300 px-2 py-2 text-sm"
+        className="flex-1 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-2 py-2 text-sm"
       />
       <input
         type="date"
         value={valores.hasta}
         onChange={(e) => setValores((v) => ({ ...v, hasta: e.target.value }))}
-        className="flex-1 rounded-lg border border-gray-300 px-2 py-2 text-sm"
+        className="flex-1 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-2 py-2 text-sm"
       />
     </div>
   );

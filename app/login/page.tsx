@@ -48,14 +48,14 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-kaxa-100 p-6">
+      <div className="w-full max-w-sm bg-white dark:bg-[#141b18] rounded-2xl shadow-sm border border-kaxa-100 dark:border-[#2a332e] p-6">
         <div className="flex items-center gap-2 mb-1">
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-kaxa-400 to-kaxa-900 flex items-center justify-center text-white font-bold">
             K
           </div>
           <span className="font-semibold text-lg">Kaxa Panel</span>
         </div>
-        <p className="text-sm text-gray-500 mb-6">Gestiona tu negocio desde cualquier lugar.</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Gestiona tu negocio desde cualquier lugar.</p>
 
         {opciones ? (
           <div className="flex flex-col gap-2">
@@ -65,12 +65,12 @@ export default function LoginPage() {
                 key={o.slug}
                 onClick={() => intentar(o.slug)}
                 disabled={cargando}
-                className="text-left rounded-lg border border-gray-300 px-3 py-2.5 text-sm active:bg-kaxa-50 disabled:opacity-60"
+                className="text-left rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2.5 text-sm active:bg-kaxa-50 dark:active:bg-kaxa-900/30 disabled:opacity-60"
               >
                 {o.negocio}
               </button>
             ))}
-            {error && <p className="text-red-600 text-sm mt-2">{error}</p>}
+            {error && <p className="text-red-600 dark:text-red-400 text-sm mt-2">{error}</p>}
             <button onClick={() => setOpciones(null)} className="text-xs text-gray-400 mt-2 text-left">
               volver
             </button>
@@ -80,7 +80,7 @@ export default function LoginPage() {
             <label className="block text-sm font-medium mb-1">Email</label>
             <input
               type="email"
-              className="w-full mb-4 rounded-lg border border-gray-300 px-3 py-2"
+              className="w-full mb-4 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -89,13 +89,13 @@ export default function LoginPage() {
             <label className="block text-sm font-medium mb-1">Contraseña</label>
             <input
               type="password"
-              className="w-full mb-5 rounded-lg border border-gray-300 px-3 py-2"
+              className="w-full mb-5 rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
 
-            {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
+            {error && <p className="text-red-600 dark:text-red-400 text-sm mb-4">{error}</p>}
 
             <button
               type="submit"

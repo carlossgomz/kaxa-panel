@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { ReactNode } from "react";
+import { SCRIPT_TEMA_INICIAL } from "@/lib/tema";
 
 export const metadata = {
   title: "Kaxa Móvil",
@@ -24,7 +25,10 @@ export const viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="es">
-      <body className="bg-cream text-ink font-sans min-h-screen">{children}</body>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_TEMA_INICIAL }} />
+      </head>
+      <body className="bg-cream dark:bg-[#0d1210] text-ink dark:text-gray-100 font-sans min-h-screen">{children}</body>
     </html>
   );
 }
