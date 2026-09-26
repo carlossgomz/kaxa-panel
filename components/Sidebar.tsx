@@ -24,6 +24,8 @@ export default function Sidebar({ negocio, rol, logo }: { negocio: string; rol: 
     { href: "/panel/caja", label: "Caja", icono: "🏦" },
     { href: "/panel/clientes", label: "Clientes", icono: "🧑‍🤝‍🧑" },
     ...(rol === "ADMIN" ? [{ href: "/panel/proveedores", label: "Proveedores", icono: "🚚" }] : []),
+    ...(rol === "ADMIN" ? [{ href: "/panel/stock-pendiente", label: "Stock por revisar", icono: "⚠️" }] : []),
+    ...(rol === "ADMIN" ? [{ href: "/panel/configuracion", label: "Configuración", icono: "⚙️" }] : []),
     ...(rol === "ADMIN" ? [{ href: "/panel/cuentas", label: "Cuentas", icono: "👥" }] : []),
   ];
 
