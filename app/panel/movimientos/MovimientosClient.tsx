@@ -37,6 +37,96 @@ export default function MovimientosClient({ movimientosIniciales }: { movimiento
   const [movimientos, setMovimientos] = useState(movimientosIniciales);
   const [totales, setTotales] = useState<{ entradas: number; salidas: number } | null>(null);
 
+  // --- Desglosar en otro producto (ej. una caja de cigarrillos que se
+  // vende cigarro por cigarro, con su propio código) ---
+  const [destinoBusqueda, setDestinoBusqueda] = useState("");
+  const [resultadosDestino, setResultadosDestino] = useState<ProductoResultado[]>([]);
+  const [mostrarDropdownDestino, setMostrarDropdownDestino] = useState(false);
+  const [productoDestino, setProductoDestino] = useState<ProductoResultado | null>(null);
+  const [cantidadOrigen, setCantidadOrigen] = useState("1");
+  const [unidadesGeneradas, setUnidadesGeneradas] = useState("");
+  const [motivoDesglose, setMotivoDesglose] = useState("");
+  const [guardandoDesglose, setGuardandoDesglose] = useState(false);
+  const [mensajeDesglose, setMensajeDesglose] = useState<string | null>(null);
+
+  useEffect(() => {
+    const term = destinoBusqueda.trim();
+    if (term.length < 2) {
+      setResultadosDestino([]);
+      setMostrarDropdownDestino(false);
+      return;
+    }
+    const t = setTimeout(async () => {
+      const res = await fetch(`/api/buscar-productos-compra?q=${encodeURIComponent(term)}`);
+      const datos = await res.json();
+      setResultadosDestino((datos.productos ?? []).filter((p: ProductoResultado) => p.id !== productoSeleccionado?.id));
+      setMostrarDropdownDestino(true);
+    }, 200);
+    return () => clearTimeout(t);
+  }, [destinoBusqueda, productoSeleccionado]);
+
+  function seleccionarProductoDestino(p: ProductoResultado) {
+    setProductoDestino(p);
+    setDestinoBusqueda("");
+    setResultadosDestino([]);
+    setMostrarDropdownDestino(false);
+    // Sugerencia de arranque, igual que en el escritorio - se puede
+    // corregir a mano si no aplica.
+    const origenUnidadesPorPaquete = productoSeleccionado?.unidades_por_paquete || 1;
+    setUnidadesGeneradas(String(origenUnidadesPorPaquete * Number(cantidadOrigen || "1")));
+  }
+
+  async function desglosar() {
+    if (!productoSeleccionado || !productoDestino) return;
+    setMensajeDesglose(null);
+    const cantOrigen = Number(cantidadOrigen);
+    const unidGeneradas = Number(unidadesGeneradas);
+    if (!cantOrigen || cantOrigen <= 0) {
+      setMensajeDesglose(`La cantidad de ${productoSeleccionado.nombre} a desglosar debe ser mayor a 0.`);
+      return;
+    }
+    if (!unidGeneradas || unidGeneradas <= 0) {
+      setMensajeDesglose(`Las unidades generadas de ${productoDestino.nombre} deben ser mayor a 0.`);
+      return;
+    }
+    if (
+      !window.confirm(
+        `¿Convertir ${cantOrigen} de "${productoSeleccionado.nombre}" en ${unidGeneradas} unidades de "${productoDestino.nombre}"?`
+      )
+    ) {
+      return;
+    }
+    setGuardandoDesglose(true);
+    try {
+      const res = await fetch("/api/desglosar-producto", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          producto_origen_id: productoSeleccionado.id,
+          producto_destino_id: productoDestino.id,
+          cantidad_origen: cantOrigen,
+          unidades_generadas: unidGeneradas,
+          motivo: motivoDesglose,
+        }),
+      });
+      const datos = await res.json();
+      if (!res.ok) {
+        setMensajeDesglose(datos.error ?? "No se pudo desglosar.");
+        return;
+      }
+      setProductoSeleccionado((prev) => (prev ? { ...prev, stock_actual: prev.stock_actual - cantOrigen } : prev));
+      await cargarMovimientos(productoSeleccionado.id);
+      setProductoDestino(null);
+      setCantidadOrigen("1");
+      setUnidadesGeneradas("");
+      setMotivoDesglose("");
+    } catch {
+      setMensajeDesglose("No se pudo conectar. Revisa tu internet e intenta de nuevo.");
+    } finally {
+      setGuardandoDesglose(false);
+    }
+  }
+
   useEffect(() => {
     const term = busqueda.trim();
     if (term.length < 2) {
@@ -69,6 +159,12 @@ export default function MovimientosClient({ movimientosIniciales }: { movimiento
     setCantidad("");
     setMotivo("");
     setMensaje(null);
+    setProductoDestino(null);
+    setDestinoBusqueda("");
+    setCantidadOrigen("1");
+    setUnidadesGeneradas("");
+    setMotivoDesglose("");
+    setMensajeDesglose(null);
     cargarMovimientos(p.id);
   }
 
@@ -200,6 +296,74 @@ export default function MovimientosClient({ movimientosIniciales }: { movimiento
             <button onClick={registrar} disabled={guardando} className="w-full rounded-lg bg-kaxa-600 text-white font-medium py-2.5 disabled:opacity-60">
               {guardando ? "Guardando…" : "Registrar"}
             </button>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+            <h2 className="font-semibold mb-1">Desglosar en otro producto</h2>
+            <p className="text-xs text-gray-500 mb-3">
+              Para cuando algo se compra empaquetado pero se vende por unidad (ej. una caja de cigarrillos que se
+              vende cigarro por cigarro, con su propio código). Esto descuenta <strong>{productoSeleccionado.nombre}</strong> como
+              salida y suma stock al producto que elijas abajo, repartiendo el costo entre las unidades generadas.
+            </p>
+
+            <label className="block text-sm font-medium mb-1">Cantidad de {productoSeleccionado.nombre} a desglosar</label>
+            <input
+              type="number"
+              inputMode="decimal"
+              className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+              value={cantidadOrigen}
+              onChange={(e) => setCantidadOrigen(e.target.value)}
+            />
+
+            <label className="block text-sm font-medium mb-1">Producto que recibe las unidades</label>
+            <div className="relative mb-3">
+              <input
+                className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                placeholder="Buscar por nombre o código"
+                value={productoDestino ? productoDestino.nombre : destinoBusqueda}
+                onChange={(e) => {
+                  setProductoDestino(null);
+                  setDestinoBusqueda(e.target.value);
+                }}
+                onFocus={() => resultadosDestino.length > 0 && setMostrarDropdownDestino(true)}
+                onBlur={() => setTimeout(() => setMostrarDropdownDestino(false), 150)}
+              />
+              {mostrarDropdownDestino && resultadosDestino.length > 0 && (
+                <ul className="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-56 overflow-y-auto">
+                  {resultadosDestino.map((p) => (
+                    <li key={p.id}>
+                      <button type="button" className="w-full text-left px-3 py-2 text-sm active:bg-kaxa-50" onMouseDown={() => seleccionarProductoDestino(p)}>
+                        <span className="font-medium">{p.nombre}</span>
+                        <span className="block text-xs text-gray-400">stock {p.stock_actual}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {productoDestino && (
+              <>
+                <label className="block text-sm font-medium mb-1">Unidades de {productoDestino.nombre} generadas</label>
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+                  value={unidadesGeneradas}
+                  onChange={(e) => setUnidadesGeneradas(e.target.value)}
+                />
+                <input
+                  className="w-full mb-3 rounded-lg border border-gray-300 px-3 py-2"
+                  placeholder="Motivo (opcional)"
+                  value={motivoDesglose}
+                  onChange={(e) => setMotivoDesglose(e.target.value)}
+                />
+                {mensajeDesglose && <p className="text-red-600 text-sm mb-3">{mensajeDesglose}</p>}
+                <button onClick={desglosar} disabled={guardandoDesglose} className="w-full rounded-lg bg-kaxa-600 text-white font-medium py-2.5 disabled:opacity-60">
+                  {guardandoDesglose ? "Desglosando…" : "Desglosar"}
+                </button>
+              </>
+            )}
           </div>
         </>
       )}

@@ -23,7 +23,7 @@ export default async function ReportesPage({ searchParams }: { searchParams: { d
   const desde = searchParams.desde || primerDiaMesISO();
   const hasta = searchParams.hasta || hoyISO();
 
-  const [config, totales, gananciaRes, porMetodo, masVendidos, masGanancia] = await Promise.all([
+  const [config, totales, gananciaRes, porMetodo, masVendidos, masGanancia, clientesFrecuentesRes, categoriasRes, horasPicoRes] = await Promise.all([
     db.execute("SELECT tasa_cambio_dia FROM config WHERE id = 1"),
 
     db.execute({
@@ -72,6 +72,29 @@ export default async function ReportesPage({ searchParams }: { searchParams: { d
             GROUP BY vi.producto_id ORDER BY ganancia_bs DESC LIMIT 5`,
       args: [desde, hasta, PRODUCTO_DELIVERY_ID],
     }),
+
+    db.execute({
+      sql: `SELECT v.cliente_nombre as nombre, COUNT(*) as num_compras, SUM(v.total_bs) as total_gastado_bs
+            FROM ventas v WHERE date(v.fecha_hora) BETWEEN ? AND ? AND v.cliente_id IS NOT NULL
+            GROUP BY v.cliente_id ORDER BY total_gastado_bs DESC LIMIT 5`,
+      args: [desde, hasta],
+    }),
+
+    db.execute({
+      sql: `SELECT COALESCE(c.nombre, 'Sin categoría') as categoria, SUM(vi.subtotal_bs) as monto_bs
+            FROM venta_items vi JOIN ventas v ON v.id = vi.venta_id JOIN productos p ON p.id = vi.producto_id
+            LEFT JOIN categorias c ON c.id = p.categoria_id
+            WHERE date(v.fecha_hora) BETWEEN ? AND ? AND p.id != ?
+            GROUP BY categoria ORDER BY monto_bs DESC LIMIT 5`,
+      args: [desde, hasta, PRODUCTO_DELIVERY_ID],
+    }),
+
+    db.execute({
+      sql: `SELECT strftime('%H', fecha_hora) as hora, COUNT(*) as num_ventas
+            FROM ventas WHERE date(fecha_hora) BETWEEN ? AND ?
+            GROUP BY hora ORDER BY num_ventas DESC LIMIT 3`,
+      args: [desde, hasta],
+    }),
   ]);
 
   const tasa = Number(config.rows[0]?.tasa_cambio_dia ?? 1) || 1;
@@ -83,6 +106,13 @@ export default async function ReportesPage({ searchParams }: { searchParams: { d
   const metodos = porMetodo.rows.map((r) => ({ metodo: String(r.metodo), monto_bs: Number(r.monto_bs) }));
   const productosTop = masVendidos.rows.map((r) => ({ nombre: String(r.nombre), cantidad: Number(r.cantidad) }));
   const productosGanancia = masGanancia.rows.map((r) => ({ nombre: String(r.nombre), ganancia_bs: Number(r.ganancia_bs) }));
+  const clientesFrecuentes = clientesFrecuentesRes.rows.map((r) => ({
+    nombre: String(r.nombre ?? "Consumidor final"),
+    num_compras: Number(r.num_compras),
+    total_gastado_bs: Number(r.total_gastado_bs),
+  }));
+  const categorias = categoriasRes.rows.map((r) => ({ categoria: String(r.categoria), monto_bs: Number(r.monto_bs) }));
+  const horasPico = horasPicoRes.rows.map((r) => ({ hora: String(r.hora), num_ventas: Number(r.num_ventas) }));
 
   const hoy = hoyISO();
   const rangos = [
@@ -156,7 +186,7 @@ export default async function ReportesPage({ searchParams }: { searchParams: { d
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
+      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
         <h2 className="font-semibold mb-2">Productos que más ganancia generan</h2>
         {productosGanancia.length === 0 && <p className="text-sm text-gray-400 py-2">Sin ventas en este período.</p>}
         <div className="flex flex-col gap-1.5">
@@ -164,6 +194,47 @@ export default async function ReportesPage({ searchParams }: { searchParams: { d
             <div key={i} className="flex items-center justify-between text-sm">
               <span className="text-gray-600 truncate pr-2">{p.nombre}</span>
               <span className="font-medium shrink-0">Bs {p.ganancia_bs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+        <h2 className="font-semibold mb-2">Clientes frecuentes</h2>
+        {clientesFrecuentes.length === 0 && <p className="text-sm text-gray-400 py-2">Sin compras de clientes identificados en este período.</p>}
+        <div className="flex flex-col gap-1.5">
+          {clientesFrecuentes.map((c, i) => (
+            <div key={i} className="flex items-center justify-between text-sm">
+              <span className="text-gray-600 truncate pr-2">
+                {c.nombre} <span className="text-xs text-gray-400">({c.num_compras} compras)</span>
+              </span>
+              <span className="font-medium shrink-0">Bs {c.total_gastado_bs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+        <h2 className="font-semibold mb-2">Categorías más vendidas</h2>
+        {categorias.length === 0 && <p className="text-sm text-gray-400 py-2">Sin ventas en este período.</p>}
+        <div className="flex flex-col gap-1.5">
+          {categorias.map((c, i) => (
+            <div key={i} className="flex items-center justify-between text-sm">
+              <span className="text-gray-600 truncate pr-2">{c.categoria}</span>
+              <span className="font-medium shrink-0">Bs {c.monto_bs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
+        <h2 className="font-semibold mb-2">Horas de mayor venta</h2>
+        {horasPico.length === 0 && <p className="text-sm text-gray-400 py-2">Sin ventas en este período.</p>}
+        <div className="flex flex-col gap-1.5">
+          {horasPico.map((h, i) => (
+            <div key={i} className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">{h.hora}:00 - {h.hora}:59</span>
+              <span className="font-medium">{h.num_ventas} ventas</span>
             </div>
           ))}
         </div>
