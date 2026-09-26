@@ -26,6 +26,7 @@ export default function Header({ negocio, rol, logo }: { negocio: string; rol: s
     { href: "/panel/cobrar", label: "Cobrar", icono: "💵" },
     ...(rol === "ADMIN" ? [{ href: "/panel/pagar", label: "Pagar", icono: "📦" }] : []),
     ...(rol === "ADMIN" ? [{ href: "/panel/compras", label: "Compras", icono: "📥" }] : []),
+    ...(rol === "ADMIN" ? [{ href: "/panel/reportes", label: "Reportes", icono: "📈" }] : []),
     { href: "/panel/facturas", label: "Facturas", icono: "🧾" },
     { href: "/panel/inventario", label: "Stock", icono: "📊" },
     { href: "/panel/caja", label: "Caja", icono: "🏦" },
