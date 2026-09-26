@@ -17,6 +17,60 @@ function primerDiaMesISO() {
   return `${hoy.getUTCFullYear()}-${String(hoy.getUTCMonth() + 1).padStart(2, "0")}-01`;
 }
 
+// Paleta fija para gráficos — se repite en ciclo si hay más filas que
+// colores (ej. un negocio con muchos métodos de pago propios agregados).
+const COLORES = ["#16A37C", "#F5A623", "#3B82F6", "#EC4899", "#8B5CF6", "#EF4444"];
+
+// Gráfico de torta hecho con conic-gradient — nada de librerías ni SVG a
+// mano, un solo div con el fondo calculado basta.
+function fondoTorta(datos: { valor: number }[]): string {
+  const total = datos.reduce((a, d) => a + d.valor, 0) || 1;
+  let acumulado = 0;
+  const tramos = datos.map((d, i) => {
+    const inicio = (acumulado / total) * 100;
+    acumulado += d.valor;
+    const fin = (acumulado / total) * 100;
+    return `${COLORES[i % COLORES.length]} ${inicio}% ${fin}%`;
+  });
+  return `conic-gradient(${tramos.join(", ")})`;
+}
+
+function GraficoTorta({ datos, formato }: { datos: { etiqueta: string; valor: number }[]; formato: (n: number) => string }) {
+  const total = datos.reduce((a, d) => a + d.valor, 0);
+  return (
+    <div className="flex items-center gap-4">
+      <div className="w-24 h-24 rounded-full shrink-0" style={{ background: fondoTorta(datos) }} />
+      <div className="flex-1 flex flex-col gap-1.5 min-w-0">
+        {datos.map((d, i) => (
+          <div key={i} className="flex items-center gap-2 text-xs">
+            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: COLORES[i % COLORES.length] }} />
+            <span className="text-gray-600 dark:text-gray-300 truncate flex-1">{d.etiqueta}</span>
+            <span className="font-medium shrink-0">{total > 0 ? Math.round((d.valor / total) * 100) : 0}%</span>
+          </div>
+        ))}
+      </div>
+      <p className="sr-only">{datos.map((d) => `${d.etiqueta}: ${formato(d.valor)}`).join(", ")}</p>
+    </div>
+  );
+}
+
+// Barra horizontal con relleno proporcional al máximo de la lista — más
+// llamativo que una fila de número contra número.
+function BarraHorizontal({ etiqueta, valor, max, color, sufijo }: { etiqueta: string; valor: number; max: number; color: string; sufijo: string }) {
+  const pct = max > 0 ? Math.max(4, (valor / max) * 100) : 0;
+  return (
+    <div>
+      <div className="flex justify-between items-baseline gap-2 mb-1">
+        <span className="text-xs text-gray-600 dark:text-gray-300 truncate">{etiqueta}</span>
+        <span className="text-xs font-semibold shrink-0">{sufijo}</span>
+      </div>
+      <div className="h-2.5 rounded-full bg-gray-100 dark:bg-[#0d1210] overflow-hidden">
+        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: color }} />
+      </div>
+    </div>
+  );
+}
+
 export default async function ReportesPage({ searchParams }: { searchParams: { desde?: string; hasta?: string } }) {
   const { db } = await exigirAdmin();
 
@@ -89,10 +143,13 @@ export default async function ReportesPage({ searchParams }: { searchParams: { d
       args: [desde, hasta, PRODUCTO_DELIVERY_ID],
     }),
 
+    // Sin LIMIT ni ORDER BY num_ventas acá — se completan las 24 horas
+    // abajo (con 0 en las que no hubo ventas) para dibujar el histograma
+    // completo del día, no solo las 3 puntas.
     db.execute({
       sql: `SELECT strftime('%H', fecha_hora) as hora, COUNT(*) as num_ventas
             FROM ventas WHERE date(fecha_hora) BETWEEN ? AND ?
-            GROUP BY hora ORDER BY num_ventas DESC LIMIT 3`,
+            GROUP BY hora`,
       args: [desde, hasta],
     }),
   ]);
@@ -112,7 +169,21 @@ export default async function ReportesPage({ searchParams }: { searchParams: { d
     total_gastado_bs: Number(r.total_gastado_bs),
   }));
   const categorias = categoriasRes.rows.map((r) => ({ categoria: String(r.categoria), monto_bs: Number(r.monto_bs) }));
-  const horasPico = horasPicoRes.rows.map((r) => ({ hora: String(r.hora), num_ventas: Number(r.num_ventas) }));
+
+  // Se completan las 24 horas del día (0 en las que no hubo ventas) para
+  // dibujar el histograma entero, no solo picos sueltos.
+  const ventasPorHora: Record<string, number> = {};
+  for (const r of horasPicoRes.rows) ventasPorHora[String(r.hora)] = Number(r.num_ventas);
+  const horas24 = Array.from({ length: 24 }, (_, h) => {
+    const hh = String(h).padStart(2, "0");
+    return { hora: hh, num_ventas: ventasPorHora[hh] ?? 0 };
+  });
+  const maxVentasHora = Math.max(1, ...horas24.map((h) => h.num_ventas));
+  const horaPicoTop = horas24.reduce((a, b) => (b.num_ventas > a.num_ventas ? b : a), horas24[0]);
+
+  const maxCantidadProducto = Math.max(1, ...productosTop.map((p) => p.cantidad));
+  const maxGananciaProducto = Math.max(1, ...productosGanancia.map((p) => p.ganancia_bs));
+  const maxGastadoCliente = Math.max(1, ...clientesFrecuentes.map((c) => c.total_gastado_bs));
 
   const hoy = hoyISO();
   const rangos = [
@@ -141,103 +212,138 @@ export default async function ReportesPage({ searchParams }: { searchParams: { d
 
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
-          <p className="text-xs text-gray-500 dark:text-gray-400">Total vendido</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">💰 Total vendido</p>
           <p className="text-lg font-semibold mt-1">Bs {totalBs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</p>
           <p className="text-sm text-kaxa-600 font-medium">${(totalBs / tasa).toFixed(2)}</p>
         </div>
         <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
-          <p className="text-xs text-gray-500 dark:text-gray-400">Ganancia estimada</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">📈 Ganancia estimada</p>
           <p className="text-lg font-semibold mt-1">Bs {gananciaBs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</p>
           <p className="text-sm text-kaxa-600 font-medium">${(gananciaBs / tasa).toFixed(2)}</p>
+          <div className="h-1.5 rounded-full bg-gray-100 dark:bg-[#0d1210] overflow-hidden mt-2">
+            <div
+              className="h-full rounded-full bg-kaxa-400"
+              style={{ width: `${totalBs > 0 ? Math.min(100, (gananciaBs / totalBs) * 100) : 0}%` }}
+            />
+          </div>
+          <p className="text-[10px] text-gray-400 mt-1">
+            margen {totalBs > 0 ? Math.round((gananciaBs / totalBs) * 100) : 0}%
+          </p>
         </div>
         <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
-          <p className="text-xs text-gray-500 dark:text-gray-400">N.º de ventas</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">🧾 N.º de ventas</p>
           <p className="text-lg font-semibold mt-1">{numVentas}</p>
         </div>
         <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
-          <p className="text-xs text-gray-500 dark:text-gray-400">Ticket promedio</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">🎟️ Ticket promedio</p>
           <p className="text-lg font-semibold mt-1">Bs {ticketPromedioBs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</p>
         </div>
       </div>
 
       <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
-        <h2 className="font-semibold mb-2">Ventas por método de pago</h2>
-        {metodos.length === 0 && <p className="text-sm text-gray-400 py-2">Sin ventas en este período.</p>}
-        <div className="flex flex-col gap-1.5">
-          {metodos.map((m) => (
-            <div key={m.metodo} className="flex items-center justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-300">{m.metodo.split("_").join(" ")}</span>
-              <span className="font-medium">Bs {m.monto_bs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</span>
-            </div>
-          ))}
-        </div>
+        <h2 className="font-semibold mb-3">💳 Ventas por método de pago</h2>
+        {metodos.length === 0 ? (
+          <p className="text-sm text-gray-400 py-2">Sin ventas en este período.</p>
+        ) : (
+          <GraficoTorta
+            datos={metodos.map((m) => ({ etiqueta: m.metodo.split("_").join(" "), valor: m.monto_bs }))}
+            formato={(n) => `Bs ${n.toFixed(0)}`}
+          />
+        )}
       </div>
 
       <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
-        <h2 className="font-semibold mb-2">Productos más vendidos</h2>
+        <h2 className="font-semibold mb-3">🏆 Productos más vendidos</h2>
         {productosTop.length === 0 && <p className="text-sm text-gray-400 py-2">Sin ventas en este período.</p>}
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2.5">
           {productosTop.map((p, i) => (
-            <div key={i} className="flex items-center justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-300 truncate pr-2">{p.nombre}</span>
-              <span className="font-medium shrink-0">{p.cantidad} vendidos</span>
-            </div>
+            <BarraHorizontal
+              key={i}
+              etiqueta={p.nombre}
+              valor={p.cantidad}
+              max={maxCantidadProducto}
+              color={COLORES[i % COLORES.length]}
+              sufijo={`${p.cantidad} vendidos`}
+            />
           ))}
         </div>
       </div>
 
       <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
-        <h2 className="font-semibold mb-2">Productos que más ganancia generan</h2>
+        <h2 className="font-semibold mb-3">💵 Productos que más ganancia generan</h2>
         {productosGanancia.length === 0 && <p className="text-sm text-gray-400 py-2">Sin ventas en este período.</p>}
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2.5">
           {productosGanancia.map((p, i) => (
-            <div key={i} className="flex items-center justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-300 truncate pr-2">{p.nombre}</span>
-              <span className="font-medium shrink-0">Bs {p.ganancia_bs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</span>
-            </div>
+            <BarraHorizontal
+              key={i}
+              etiqueta={p.nombre}
+              valor={p.ganancia_bs}
+              max={maxGananciaProducto}
+              color={COLORES[i % COLORES.length]}
+              sufijo={`Bs ${p.ganancia_bs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}`}
+            />
           ))}
         </div>
       </div>
 
       <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
-        <h2 className="font-semibold mb-2">Clientes frecuentes</h2>
+        <h2 className="font-semibold mb-3">🧑‍🤝‍🧑 Clientes frecuentes</h2>
         {clientesFrecuentes.length === 0 && <p className="text-sm text-gray-400 py-2">Sin compras de clientes identificados en este período.</p>}
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2.5">
           {clientesFrecuentes.map((c, i) => (
-            <div key={i} className="flex items-center justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-300 truncate pr-2">
-                {c.nombre} <span className="text-xs text-gray-400">({c.num_compras} compras)</span>
-              </span>
-              <span className="font-medium shrink-0">Bs {c.total_gastado_bs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</span>
-            </div>
+            <BarraHorizontal
+              key={i}
+              etiqueta={`${c.nombre} (${c.num_compras})`}
+              valor={c.total_gastado_bs}
+              max={maxGastadoCliente}
+              color={COLORES[i % COLORES.length]}
+              sufijo={`Bs ${c.total_gastado_bs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}`}
+            />
           ))}
         </div>
       </div>
 
       <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4 mb-4">
-        <h2 className="font-semibold mb-2">Categorías más vendidas</h2>
-        {categorias.length === 0 && <p className="text-sm text-gray-400 py-2">Sin ventas en este período.</p>}
-        <div className="flex flex-col gap-1.5">
-          {categorias.map((c, i) => (
-            <div key={i} className="flex items-center justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-300 truncate pr-2">{c.categoria}</span>
-              <span className="font-medium shrink-0">Bs {c.monto_bs.toLocaleString("es-VE", { maximumFractionDigits: 0 })}</span>
-            </div>
-          ))}
-        </div>
+        <h2 className="font-semibold mb-3">🍰 Categorías más vendidas</h2>
+        {categorias.length === 0 ? (
+          <p className="text-sm text-gray-400 py-2">Sin ventas en este período.</p>
+        ) : (
+          <GraficoTorta
+            datos={categorias.map((c) => ({ etiqueta: c.categoria, valor: c.monto_bs }))}
+            formato={(n) => `Bs ${n.toFixed(0)}`}
+          />
+        )}
       </div>
 
       <div className="bg-white dark:bg-[#141b18] rounded-2xl border border-kaxa-100 dark:border-[#2a332e] shadow-sm p-4">
-        <h2 className="font-semibold mb-2">Horas de mayor venta</h2>
-        {horasPico.length === 0 && <p className="text-sm text-gray-400 py-2">Sin ventas en este período.</p>}
-        <div className="flex flex-col gap-1.5">
-          {horasPico.map((h, i) => (
-            <div key={i} className="flex items-center justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-300">{h.hora}:00 - {h.hora}:59</span>
-              <span className="font-medium">{h.num_ventas} ventas</span>
+        <h2 className="font-semibold mb-1">⏰ Horas de mayor venta</h2>
+        {numVentas === 0 ? (
+          <p className="text-sm text-gray-400 py-2">Sin ventas en este período.</p>
+        ) : (
+          <>
+            <p className="text-xs text-gray-400 mb-3">
+              La hora más movida es <span className="font-semibold text-kaxa-600">{horaPicoTop.hora}:00</span>, con{" "}
+              {horaPicoTop.num_ventas} venta{horaPicoTop.num_ventas === 1 ? "" : "s"}.
+            </p>
+            <div className="flex items-end gap-[3px] h-20">
+              {horas24.map((h) => (
+                <div key={h.hora} className="flex-1 h-full flex items-end">
+                  <div
+                    className={`w-full rounded-t ${h.hora === horaPicoTop.hora ? "bg-kaxa-600" : "bg-kaxa-100 dark:bg-kaxa-900/50"}`}
+                    style={{ height: `${Math.max(3, (h.num_ventas / maxVentasHora) * 100)}%` }}
+                  />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+            <div className="flex justify-between text-[9px] text-gray-400 mt-1">
+              <span>12am</span>
+              <span>6am</span>
+              <span>12pm</span>
+              <span>6pm</span>
+              <span>11pm</span>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
