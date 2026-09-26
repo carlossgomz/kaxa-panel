@@ -13,16 +13,27 @@ const SECCIONES_PERSONALIZABLES = [
 
 export default async function ConfiguracionPage() {
   const { db, negocio } = await exigirAdmin();
+  // Columnas presentes en TODAS las ediciones (incluida la build especial de
+  // Day Express, que no tiene secciones_ocultas — ver abajo).
   const res = await db.execute(
-    "SELECT nombre_negocio, tasa_cambio_dia, secciones_ocultas, logo_base64, rif_negocio, direccion_negocio, telefono_negocio FROM config WHERE id = 1"
+    "SELECT nombre_negocio, tasa_cambio_dia, logo_base64, rif_negocio, direccion_negocio, telefono_negocio FROM config WHERE id = 1"
   );
   const fila = res.rows[0];
 
+  // secciones_ocultas no existe en la build de Day Express (no tiene la
+  // categoría "Personalización" en su Configuracion de escritorio, porque
+  // directamente no tiene esa pantalla) — aunque su negocio esté marcado
+  // como "avanzado" en el directorio para poder usar Kaxa Móvil. Se separa
+  // en su propia consulta para que si esa columna no existe, solo se pierda
+  // esta sección en vez de tumbar toda la página (pasó justo eso: Day
+  // Express veía un error 500 al abrir Configuración).
   let ocultas: string[] = [];
+  let soportaPersonalizacion = true;
   try {
-    ocultas = JSON.parse(String(fila?.secciones_ocultas ?? "[]"));
+    const resOcultas = await db.execute("SELECT secciones_ocultas FROM config WHERE id = 1");
+    ocultas = JSON.parse(String(resOcultas.rows[0]?.secciones_ocultas ?? "[]"));
   } catch {
-    ocultas = [];
+    soportaPersonalizacion = false;
   }
 
   return (
@@ -31,6 +42,7 @@ export default async function ConfiguracionPage() {
       tasaHoy={Number(fila?.tasa_cambio_dia ?? 1)}
       seccionesOcultas={ocultas}
       seccionesPersonalizables={SECCIONES_PERSONALIZABLES}
+      soportaPersonalizacion={soportaPersonalizacion}
       logo={fila?.logo_base64 ? String(fila.logo_base64) : null}
       rifNegocio={fila?.rif_negocio ? String(fila.rif_negocio) : ""}
       direccionNegocio={fila?.direccion_negocio ? String(fila.direccion_negocio) : ""}

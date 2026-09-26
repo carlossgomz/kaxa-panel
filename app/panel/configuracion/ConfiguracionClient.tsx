@@ -11,6 +11,7 @@ export default function ConfiguracionClient({
   tasaHoy,
   seccionesOcultas,
   seccionesPersonalizables,
+  soportaPersonalizacion,
   logo,
   rifNegocio,
   direccionNegocio,
@@ -21,6 +22,7 @@ export default function ConfiguracionClient({
   tasaHoy: number;
   seccionesOcultas: string[];
   seccionesPersonalizables: Seccion[];
+  soportaPersonalizacion: boolean;
   logo: string | null;
   rifNegocio: string;
   direccionNegocio: string;
@@ -236,27 +238,29 @@ export default function ConfiguracionClient({
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
-        <h2 className="font-semibold mb-1">Personalización</h2>
-        <p className="text-xs text-gray-400 mb-3">Ocultá lo que tu negocio no usa, en el programa de escritorio y acá.</p>
-        <div className="flex flex-col gap-3">
-          {seccionesPersonalizables.map((s) => (
-            <label key={s.key} className="flex items-start gap-3">
-              <input
-                type="checkbox"
-                className="mt-1"
-                checked={!ocultas.includes(s.key)}
-                onChange={(e) => alternarSeccion(s.key, e.target.checked)}
-                disabled={guardando === s.key}
-              />
-              <span>
-                <span className="block text-sm font-medium">{s.label}</span>
-                <span className="block text-xs text-gray-400">{s.descripcion}</span>
-              </span>
-            </label>
-          ))}
+      {soportaPersonalizacion && (
+        <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4 mb-4">
+          <h2 className="font-semibold mb-1">Personalización</h2>
+          <p className="text-xs text-gray-400 mb-3">Ocultá lo que tu negocio no usa, en el programa de escritorio y acá.</p>
+          <div className="flex flex-col gap-3">
+            {seccionesPersonalizables.map((s) => (
+              <label key={s.key} className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  className="mt-1"
+                  checked={!ocultas.includes(s.key)}
+                  onChange={(e) => alternarSeccion(s.key, e.target.checked)}
+                  disabled={guardando === s.key}
+                />
+                <span>
+                  <span className="block text-sm font-medium">{s.label}</span>
+                  <span className="block text-xs text-gray-400">{s.descripcion}</span>
+                </span>
+              </label>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="bg-white rounded-2xl border border-kaxa-100 shadow-sm p-4">
         <h2 className="font-semibold mb-2">Acerca de</h2>
