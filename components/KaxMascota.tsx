@@ -40,7 +40,7 @@ export default function KaxMascota({ pose, size = 72 }: { pose: PoseKax; size?: 
 
       {pose === "alerta" && (
         <>
-          <circle cx="200" cy="30" r="17" fill="#F5A623" />
+          <circle cx="200" cy="30" r="17" fill="#C9820B" />
           <rect x="196" y="20" width="8" height="14" rx="4" fill="#ffffff" />
           <circle cx="200" cy="40" r="3" fill="#ffffff" />
           <rect x="18" y="130" width="24" height="58" rx="12" fill="url(#kaxBody)" transform="rotate(30 30 130)" />
@@ -67,10 +67,10 @@ export default function KaxMascota({ pose, size = 72 }: { pose: PoseKax; size?: 
 
       {pose === "celebrando" && (
         <>
-          <circle cx="20" cy="40" r="5" fill="#F5A623" />
+          <circle cx="20" cy="40" r="5" fill="#C9820B" />
           <circle cx="45" cy="10" r="4" fill="#EC4899" />
           <circle cx="185" cy="20" r="5" fill="#3B82F6" />
-          <circle cx="205" cy="55" r="4" fill="#F5A623" />
+          <circle cx="205" cy="55" r="4" fill="#C9820B" />
           <rect x="30" y="60" width="8" height="8" fill="#16A37C" transform="rotate(20 34 64)" />
           <rect x="195" y="90" width="8" height="8" fill="#EC4899" transform="rotate(-15 199 94)" />
           <rect x="8" y="20" width="24" height="76" rx="12" fill="url(#kaxBody)" transform="rotate(35 20 96)" />

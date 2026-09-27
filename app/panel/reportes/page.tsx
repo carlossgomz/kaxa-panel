@@ -21,7 +21,7 @@ function primerDiaMesISO() {
 
 // Paleta fija para gráficos — se repite en ciclo si hay más filas que
 // colores (ej. un negocio con muchos métodos de pago propios agregados).
-const COLORES = ["#16A37C", "#F5A623", "#3B82F6", "#EC4899", "#8B5CF6", "#EF4444"];
+const COLORES = ["#16A37C", "#C9820B", "#3B82F6", "#EC4899", "#8B5CF6", "#EF4444"];
 
 // Gráfico de torta hecho con conic-gradient — nada de librerías ni SVG a
 // mano, un solo div con el fondo calculado basta.
