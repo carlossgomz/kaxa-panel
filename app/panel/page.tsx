@@ -61,7 +61,7 @@ export default async function PanelPage() {
        JOIN ventas v ON v.id = vi.venta_id
        JOIN productos p ON p.id = vi.producto_id
        WHERE strftime('%Y-%m', v.fecha_hora) = strftime('%Y-%m', 'now', '-4 hours')
-         AND vi.producto_id != 'f195fbac-103d-48fa-a27a-28371fba7745'
+         AND p.uso_interno = 0
        GROUP BY vi.producto_id
        ORDER BY cantidad DESC
        LIMIT 1`

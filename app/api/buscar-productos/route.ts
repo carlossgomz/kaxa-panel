@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     db.execute("SELECT tasa_cambio_dia FROM config WHERE id = 1"),
     db.execute({
       sql: `SELECT id, codigo_barra, nombre, costo_actual_usd, margen_porcentaje, stock_actual
-            FROM productos WHERE activo = 1 AND (${sqlSinAcentos("nombre")} LIKE ? OR codigo_barra LIKE ?)
+            FROM productos WHERE activo = 1 AND uso_interno = 0 AND (${sqlSinAcentos("nombre")} LIKE ? OR codigo_barra LIKE ?)
             ORDER BY nombre LIMIT 8`,
       args: [`%${normalizarTexto(term)}%`, `%${term}%`],
     }),

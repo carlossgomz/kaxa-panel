@@ -1,9 +1,5 @@
 import type { Client } from "@libsql/client";
 
-// Mismo producto "placeholder" del recargo de delivery que excluyen
-// Reportes y Estadisticas.tsx del escritorio — no es un producto real.
-const PRODUCTO_DELIVERY_ID = "f195fbac-103d-48fa-a27a-28371fba7745";
-
 export type Consejo = {
   prioridad: "urgente" | "atencion" | "positivo" | "tip";
   icono: string;
@@ -131,10 +127,10 @@ export async function obtenerConsejos(
                    p.precio_venta_bs - p.costo_actual_usd * ? as margen_bs,
                    p.costo_actual_usd * ? as costo_bs
             FROM productos p
-            WHERE p.activo = 1 AND p.id != ? AND p.costo_actual_usd > 0 AND p.precio_venta_bs > 0
+            WHERE p.activo = 1 AND p.uso_interno = 0 AND p.costo_actual_usd > 0 AND p.precio_venta_bs > 0
             ORDER BY (p.precio_venta_bs - p.costo_actual_usd * ?) / (p.costo_actual_usd * ?) ASC
             LIMIT 1`,
-      args: [tasa, tasa, PRODUCTO_DELIVERY_ID, tasa, tasa],
+      args: [tasa, tasa, tasa, tasa],
     });
     const filaMargen = margenBajo.rows[0];
     if (filaMargen) {
@@ -162,10 +158,10 @@ export async function obtenerConsejos(
             FROM productos p
             JOIN venta_items vi ON vi.producto_id = p.id
             JOIN ventas v ON v.id = vi.venta_id
-            WHERE p.activo = 1 AND p.id != ? AND p.stock_minimo > 0 AND p.stock_actual <= p.stock_minimo
+            WHERE p.activo = 1 AND p.uso_interno = 0 AND p.stock_minimo > 0 AND p.stock_actual <= p.stock_minimo
               AND date(v.fecha_hora) >= date('now', '-4 hours', '-30 days')
             GROUP BY p.id ORDER BY ganancia_30d_bs DESC LIMIT 1`,
-      args: [PRODUCTO_DELIVERY_ID],
+      args: [],
     });
     const filaPocoStock = pocoStock.rows[0];
     if (filaPocoStock) {
@@ -182,14 +178,14 @@ export async function obtenerConsejos(
     const stockMuerto = await db.execute({
       sql: `SELECT p.nombre, p.stock_actual, p.stock_actual * p.costo_actual_usd as capital_usd
             FROM productos p
-            WHERE p.activo = 1 AND p.id != ? AND p.stock_actual > 0
+            WHERE p.activo = 1 AND p.uso_interno = 0 AND p.stock_actual > 0
               AND p.created_at <= date('now', '-4 hours', '-${UMBRAL_DIAS_SIN_MOVIMIENTO} days')
               AND NOT EXISTS (
                 SELECT 1 FROM venta_items vi JOIN ventas v ON v.id = vi.venta_id
                 WHERE vi.producto_id = p.id AND date(v.fecha_hora) >= date('now', '-4 hours', '-${UMBRAL_DIAS_SIN_MOVIMIENTO} days')
               )
             ORDER BY capital_usd DESC LIMIT 1`,
-      args: [PRODUCTO_DELIVERY_ID],
+      args: [],
     });
     const filaMuerto = stockMuerto.rows[0];
     if (filaMuerto && Number(filaMuerto.capital_usd) >= UMBRAL_CAPITAL_ESTANCADO_USD) {

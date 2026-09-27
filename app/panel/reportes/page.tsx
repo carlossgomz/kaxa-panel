@@ -4,11 +4,6 @@ import ReportesFiltro from "./ReportesFiltro";
 import { obtenerConclusionesReporte } from "@/lib/asistente";
 import KaxMascota, { type PoseKax } from "@/components/KaxMascota";
 
-// Mismo producto "placeholder" del recargo de delivery que ya excluyen
-// Estadisticas.tsx y /panel (Inicio) del escritorio - no es un producto
-// real, así que no debería aparecer en ningún ranking.
-const PRODUCTO_DELIVERY_ID = "f195fbac-103d-48fa-a27a-28371fba7745";
-
 function hoyISO() {
   // America/Caracas, UTC-4 fijo.
   return new Date(Date.now() - 4 * 3600 * 1000).toISOString().slice(0, 10);
@@ -116,17 +111,17 @@ export default async function ReportesPage({ searchParams }: { searchParams: { d
     db.execute({
       sql: `SELECT p.nombre, SUM(CASE WHEN p.por_peso = 1 THEN 1 ELSE vi.cantidad END) as cantidad
             FROM venta_items vi JOIN ventas v ON v.id = vi.venta_id JOIN productos p ON p.id = vi.producto_id
-            WHERE date(v.fecha_hora) BETWEEN ? AND ? AND p.id != ?
+            WHERE date(v.fecha_hora) BETWEEN ? AND ? AND p.uso_interno = 0
             GROUP BY vi.producto_id ORDER BY cantidad DESC LIMIT 5`,
-      args: [desde, hasta, PRODUCTO_DELIVERY_ID],
+      args: [desde, hasta],
     }),
 
     db.execute({
       sql: `SELECT p.nombre, SUM(vi.cantidad * (vi.precio_unit_bs - p.costo_actual_usd * v.tasa_cambio_dia)) as ganancia_bs
             FROM venta_items vi JOIN ventas v ON v.id = vi.venta_id JOIN productos p ON p.id = vi.producto_id
-            WHERE date(v.fecha_hora) BETWEEN ? AND ? AND p.id != ?
+            WHERE date(v.fecha_hora) BETWEEN ? AND ? AND p.uso_interno = 0
             GROUP BY vi.producto_id ORDER BY ganancia_bs DESC LIMIT 5`,
-      args: [desde, hasta, PRODUCTO_DELIVERY_ID],
+      args: [desde, hasta],
     }),
 
     db.execute({
@@ -140,9 +135,9 @@ export default async function ReportesPage({ searchParams }: { searchParams: { d
       sql: `SELECT COALESCE(c.nombre, 'Sin categoría') as categoria, SUM(vi.subtotal_bs) as monto_bs
             FROM venta_items vi JOIN ventas v ON v.id = vi.venta_id JOIN productos p ON p.id = vi.producto_id
             LEFT JOIN categorias c ON c.id = p.categoria_id
-            WHERE date(v.fecha_hora) BETWEEN ? AND ? AND p.id != ?
+            WHERE date(v.fecha_hora) BETWEEN ? AND ? AND p.uso_interno = 0
             GROUP BY categoria ORDER BY monto_bs DESC LIMIT 5`,
-      args: [desde, hasta, PRODUCTO_DELIVERY_ID],
+      args: [desde, hasta],
     }),
 
     // Sin LIMIT ni ORDER BY num_ventas acá — se completan las 24 horas
