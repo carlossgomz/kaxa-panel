@@ -476,19 +476,22 @@ export default function CompraForm({
               <option value="VES">Bs</option>
             </select>
           </div>
-          {monedaVes && (
-            <div className="flex-1">
-              <label className="block text-sm font-medium mb-1">Tasa (Bs/$)</label>
-              <input
-                type="number"
-                step="0.01"
-                inputMode="decimal"
-                className="w-full rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
-                value={tasaFactura}
-                onChange={(e) => setTasaFactura(e.target.value)}
-              />
-            </div>
-          )}
+          {/* Igual que en Compras.tsx del escritorio: la tasa del día se
+              pide SIEMPRE, no solo cuando la factura viene en Bs — hace
+              falta para calcular el precio de venta en Bs incluso si la
+              factura llegó en dólares, y para poder corregirla al cargar
+              una factura de un día anterior. */}
+          <div className="flex-1">
+            <label className="block text-sm font-medium mb-1">Tasa del día (Bs/$)</label>
+            <input
+              type="number"
+              step="0.01"
+              inputMode="decimal"
+              className="w-full rounded-lg border border-gray-300 dark:border-[#2a332e] dark:bg-[#0d1210] dark:text-gray-100 px-3 py-2"
+              value={tasaFactura}
+              onChange={(e) => setTasaFactura(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
